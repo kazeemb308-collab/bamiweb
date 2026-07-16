@@ -153,6 +153,17 @@
             <a style="text-decoration: none; color: white;" href="help.html" style="color: white;">Help</a>
         </p>
     </footer>
-    <a href="index.html" style="position: fixed; text-decoration: none; bottom: 20px; right: 20px; padding: 10px 10px; font-size: 16px; border: none; border-radius: 5px; background-color: #99c6f2; color: white; cursor: pointer;">Light Mode</a> 
+    <button onclick="lightMode()" style="position: fixed; bottom: 20px; right: 20px; background-color: #99c6f2; color: black; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Light Mode</button>
+    <script>
+        function lightMode() {
+            localStorage.setItem("theme", "light");
+            window.location.href = "index.html";
+        }
+    </script>
+    <script>
+        if (localStorage.getItem("theme") === "light") {
+            window.location.href = "index.html";
+        }
+    </script>
 </body>
 </html>
