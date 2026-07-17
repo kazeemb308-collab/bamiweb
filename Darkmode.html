@@ -6,6 +6,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <title>Bamiweb</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="darkmode.css">
+    <script>
+        try{ sessionStorage.setItem('bami-theme','dark'); }catch(e){}
+    </script>
     <style>
         body {
             margin: 0;
@@ -292,18 +296,19 @@
     <footer style="text-align: center; margin-top: 20px; font-family: 'Roboto', sans-serif; font-size: 12px;">
         <p style="color: white;">Contact us: <a style="text-decoration: none; color: white;" href="mailto:kazeemb308@gmail.com" style="color: white;">kazeemb308@gmail.com</a></p>
         <p style="color: white;">
-            <a style="text-decoration: none; color: white;" href="privacy.html" style="color: white;">Privacy Policy</a> &nbsp;&nbsp;
-            <a style="text-decoration: none; color: white;" href="terms.html" style="color: white;">Terms of Service</a>
+            <a style="text-decoration: none; color: white;" href="privacy-dark.html" style="color: white;">Privacy Policy</a> &nbsp;&nbsp;
+            <a style="text-decoration: none; color: white;" href="terms-dark.html" style="color: white;">Terms of Service</a>
         </p>
         <p style="color: white;">
-            <a style="text-decoration: none; color: white;" href="about.html" style="color: white;">About Us</a> &nbsp;&nbsp;
-            <a style="text-decoration: none; color: white;" href="help.html" style="color: white;">Help</a>
+            <a style="text-decoration: none; color: white;" href="about-dark.html" style="color: white;">About Us</a> &nbsp;&nbsp;
+            <a style="text-decoration: none; color: white;" href="help-dark.html" style="color: white;">Help</a>
         </p>
     </footer>
     <button onclick="lightMode()" style="position: fixed; bottom: 20px; right: 20px; background-color: #4097ee; color: white; padding: 10px 15px; border-radius: 5px; border: 1px solid #333; text-decoration: none;">Light Mode</button>
     <script>
         function lightMode() {
             localStorage.setItem("theme", "light");
+            try{ sessionStorage.removeItem('bami-theme'); }catch(e){}
             window.location.href = "index.html";
         }
     </script>
