@@ -7,70 +7,175 @@
     <title>Bamiweb</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <style>
-       /* Basic Styling For The Navigation Bar */
         body {
             margin: 0;
             padding: 0;
             font-family: 'Roboto', sans-serif;
-            background-color: black;
+            background-color: #000000;
+            color: #ffffff;
         }
         .navbar {
-            background-color: black;
-            color: white;
+            background-color: #000000;
+            color: #ffffff;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 10px 0;
-            margin:0%;
             position: sticky;
             top: 0;
         }
         .navbar a {
-            color: white;
+            color: #ffffff;
             text-decoration: none;
             padding: 14px 12px;
             font-size: 16px;
         }
         .navbar a:hover {
-            background-color: #ddd;
-            color: black;
+            background-color: #ffffff;
+            color: #000000;
         }
         a:hover {
-            background-color: #ddd;
-            color: purple;
+            background-color: #ffffff;
+            color: #9c27b0;
             text-decoration: dashed;
         }
-       h1 {
+        h1 {
             text-align: center;
             margin-top: 50px;
             font-size: 50px;
             font-family: 'Roboto', sans-serif;
             padding: 30px;
         }
-        div { font-family: 'Roboto', sans-serif; font-size: 10px; text-align: center; margin-top: 20px; }
-        input[type="text"] {
-            width: 300px;
-            height: 30px;
-            font-size: 16px;
+        div {
+            font-family: 'Roboto', sans-serif;
+            font-size: 10px;
+            text-align: center;
+            margin-top: 20px;
         }
-        input[type="submit"] {
-            height: 36px;
+        .search-form {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: min(92%, 700px);
+            margin: 0 auto;
+        }
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+            max-width: 600px;
+        }
+        .search-input {
+            width: 70%;
+            height: 48px;
             font-size: 16px;
-            padding: 10px 25px;
-            color: black;
+            padding: 12px 16px;
+            border-radius: 999px;
+            border: 1px solid #333333;
+            box-sizing: border-box;
+            outline: none;
+            background-color: #111111;
+            color: #ffffff;
+            box-shadow: 0 1px 3px rgba(255, 255, 255, 0.06);
+            margin-left: 50px;
+            margin-right: 70px;
+        }
+        .search-input:focus {
+            border-color: #4097ee;
+            box-shadow: 0 0 0 3px rgba(64, 151, 238, 0.2);
+        }
+        .search-btn {
+            height: 48px;
+            min-width: 104px;
+            padding: 0 18px;
+            border-radius: 999px;
+            background-color: #4097ee;
+            color: #ffffff;
+            border: 1px solid #333333;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 18px;
+            margin-right: 65px;
+        }
+        .suggestions-list {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #111111;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            max-height: 240px;
+            overflow-y: auto;
+            padding: 6px 0;
+        }
+        .suggestion-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #ffffff;
+        }
+        .suggestion-item:hover {
+            background-color: #1f1f1f;
+        }
+        .history-box {
+            width: min(92%, 600px);
+            background: #111111;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            padding: 10px 12px;
+            box-shadow: 0 2px 6px rgba(255, 255, 255, 0.04);
+            text-align: left;
+        }
+        .history-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #cccccc;
+            margin: 0 0 8px;
+        }
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .history-item {
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 13px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+        .history-item:hover {
+            background: #222222;
         }
         .trending-section {
-            background-color: black;
+            background-color: #111111;
             padding: 20px;
             margin: 20px auto;
             max-width: 800px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.06);
         }
         .trending-section h2 {
             font-size: 24px;
             margin-bottom: 10px;
+            color: #ffffff;
         }
         .trending-section ul {
             list-style-type: none;
@@ -80,14 +185,27 @@
             margin: 5px 0;
             font-size: 18px;
             text-decoration: none;
-            color: white;
+            color: #ffffff;
         }
         .trending-section ul li:hover {
-            background-color: #ddd;
-            color: purple;
+            background-color: #1f1f1f;
+            color: #ffffff;
             text-decoration: dashed;
         }
-
+        @media (max-width: 600px) {
+            .search-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .search-wrapper {
+                width: 100%;
+                min-width: 0;
+            }
+            .search-btn {
+                width: 100%;
+                max-width: 220px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -101,9 +219,18 @@
     <h1>
         <span style="color: rgba(78, 156, 78, 0.726);">B</span><span style="color: rgb(180, 96, 96);">A</span><span style="color: rgb(190, 190, 107);">M</span><span style="color: rgb(100, 100, 201);">I</span><span style="color: rgb(129, 199, 129);">w</span><span style="color: rgb(187, 125, 125);">e</span><span style="color: rgb(132, 132, 211);">b</span>
     </h1>
-    <form action="https://www.google.com/search" method="get" style="text-align: center; margin-top: 20px;">
-        <input type="text" name="q" placeholder="&#128269; Search Bami web" style="width: 90%; height: 30px; font-size: 16px; max-width: 500px; padding: 12px; border-radius: 20px; border: 1px solid wheat; color: white; background-color: black;">&nbsp;
-        <input type="submit" value="Search" style="height: 36px; font-size: 16px; padding: 10px 25px;border-radius: 20px; background-color: #99c6f2; border: none; cursor: pointer;">
+    <form id="search-form" class="search-form" action="https://www.google.com/search" method="get">
+        <div class="search-row">
+            <div class="search-wrapper">
+                <input id="search-input" class="search-input" type="text" name="q" placeholder="🔍 Search Bami web" autocomplete="off">
+                <div id="suggestions-list" class="suggestions-list"></div>
+            </div>
+            <button type="submit" class="search-btn">Search</button>
+        </div>
+        <div id="search-history" class="history-box">
+            <p class="history-title">Recent searches</p>
+            <div id="history-list" class="history-list"></div>
+        </div>
     </form>
    <P style="text-align: center;">
     <a href="https://www.facebook.com/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
@@ -157,7 +284,7 @@
             <a style="text-decoration: none; color: white;" href="help.html" style="color: white;">Help</a>
         </p>
     </footer>
-    <button onclick="lightMode()" style="position: fixed; bottom: 20px; right: 20px; background-color: #99c6f2; color: black; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Light Mode</button>
+    <button onclick="lightMode()" style="position: fixed; bottom: 20px; right: 20px; background-color: #4097ee; color: white; padding: 10px 15px; border-radius: 5px; border: 1px solid #333; text-decoration: none;">Light Mode</button>
     <script>
         function lightMode() {
             localStorage.setItem("theme", "light");
@@ -168,6 +295,218 @@
         if (localStorage.getItem("theme") === "light") {
             window.location.href = "index.html";
         }
+    </script>
+    <script>
+        const searchForm = document.getElementById("search-form");
+        const searchInput = document.getElementById("search-input");
+        const suggestionsList = document.getElementById("suggestions-list");
+        const historyList = document.getElementById("history-list");
+        const historyKey = "bamiweb-search-history-dark";
+        const fallbackSuggestions = [
+            "latest tech news",
+            "world news today",
+            "international travel guide",
+            "global climate change",
+            "best universities in Europe",
+            "latest AI news",
+            "top movies 2026",
+            "popular songs 2026",
+            "healthy recipes",
+            "world cup 2026",
+            "best fitness exercises",
+            "best cooking recipes",
+            "best home decor",
+            "best smart home devices",
+            "latest fashion trends",
+            "top video games 2026",
+            "how to learn programming",
+            "best coding languages to learn",
+            "what is AI",
+            "who is Elon Musk",
+            "how to start a blog",
+            "how to make money online",
+            "best laptop for students",
+            "best smartphones 2026",
+            "latest crypto news",
+            "weather today",
+            "new movies this week",
+            "football live scores",
+            "healthy breakfast ideas",
+            "travel tips for europe",
+            "website design inspiration",
+            "free online courses",
+            "best productivity apps",
+            "remote jobs worldwide",
+            "digital nomad guide",
+            "stock market today",
+            "travel visa information",
+            "www.facebook.com",
+            "www.instagram.com",
+            "www.tiktok.com",
+            "www.twitter.com",
+            "www.linkedin.com",
+            "www.youtube.com",
+            "www.pinterest.com",
+            "www.amazon.com",
+            "www.wikipedia.org",
+            "www.netflix.com",
+            "www.google.com",
+            "www.bbc.com",
+            "www.cnn.com",
+            "www.reuters.com",
+            "www.nytimes.com",
+            "www.bing.com",
+            "www.yahoo.com",
+            "www.duckduckgo.com",
+            "www.reddit.com",
+            "www.quora.com",
+            "www.stackoverflow.com",
+            "www.medium.com",
+            "www.spotify.com",
+            "www.twitch.tv",
+            "www.imdb.com",
+            "www.weather.com"
+        ];
+        let activeRequestId = 0;
+        let pendingScript = null;
+
+        function getHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(historyKey)) || [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveSearch(query) {
+            const value = query.trim();
+            if (!value) return;
+
+            const history = getHistory();
+            const updated = [value, ...history.filter(item => item.toLowerCase() !== value.toLowerCase())].slice(0, 8);
+            localStorage.setItem(historyKey, JSON.stringify(updated));
+            renderHistory(updated);
+        }
+
+        function renderHistory(items = getHistory()) {
+            if (!items.length) {
+                historyList.innerHTML = '<span class="history-item">No recent searches yet</span>';
+                return;
+            }
+
+            historyList.innerHTML = items.map(item => `<button type="button" class="history-item" data-value="${item}">${item}</button>`).join("");
+        }
+
+        function renderSuggestions(items) {
+            const uniqueItems = [...new Set(items)].slice(0, 10);
+            if (!uniqueItems.length) {
+                suggestionsList.innerHTML = "";
+                suggestionsList.style.display = "none";
+                return;
+            }
+
+            suggestionsList.innerHTML = "";
+            const fragment = document.createDocumentFragment();
+            uniqueItems.forEach((item) => {
+                const suggestionItem = document.createElement("div");
+                suggestionItem.className = "suggestion-item";
+                suggestionItem.textContent = item;
+                suggestionItem.dataset.value = item;
+                fragment.appendChild(suggestionItem);
+            });
+            suggestionsList.appendChild(fragment);
+            suggestionsList.style.display = "block";
+        }
+
+        function getLocalSuggestions(query) {
+            const q = query.trim().toLowerCase();
+            return q
+                ? fallbackSuggestions.filter(item => item.toLowerCase().includes(q)).slice(0, 8)
+                : fallbackSuggestions.slice(0, 8);
+        }
+
+        function showSuggestions() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                renderSuggestions([]);
+                return;
+            }
+
+            const localMatches = getLocalSuggestions(query);
+            renderSuggestions(localMatches);
+
+            const requestId = ++activeRequestId;
+            const callbackName = `bamiSuggest${Date.now()}${Math.floor(Math.random() * 100000)}`;
+
+            window[callbackName] = (data) => {
+                delete window[callbackName];
+                if (requestId !== activeRequestId) return;
+
+                const remoteItems = Array.isArray(data?.[1])
+                    ? data[1].filter(Boolean).map(item => String(item).trim())
+                    : [];
+
+                const combined = [...new Set([...remoteItems, ...localMatches])].slice(0, 10);
+                renderSuggestions(combined);
+            };
+
+            const script = document.createElement("script");
+            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&hl=en&q=${encodeURIComponent(query)}&callback=${callbackName}`;
+            script.async = true;
+            script.onerror = () => {
+                if (requestId === activeRequestId) {
+                    renderSuggestions(localMatches);
+                }
+            };
+
+            if (pendingScript) {
+                pendingScript.remove();
+            }
+            document.body.appendChild(script);
+            pendingScript = script;
+
+            setTimeout(() => {
+                if (script.parentNode) {
+                    script.parentNode.removeChild(script);
+                }
+            }, 4000);
+        }
+
+        searchInput.addEventListener("input", showSuggestions);
+        searchInput.addEventListener("focus", showSuggestions);
+
+        searchForm.addEventListener("submit", (event) => {
+            const value = searchInput.value.trim();
+            if (!value) {
+                event.preventDefault();
+                return;
+            }
+            saveSearch(value);
+        });
+
+        suggestionsList.addEventListener("click", (event) => {
+            const item = event.target.closest(".suggestion-item");
+            if (!item) return;
+            searchInput.value = item.getAttribute("data-value");
+            suggestionsList.style.display = "none";
+            searchInput.form.requestSubmit ? searchInput.form.requestSubmit() : searchInput.form.submit();
+        });
+
+        historyList.addEventListener("click", (event) => {
+            const item = event.target.closest(".history-item");
+            if (!item || item.textContent === "No recent searches yet") return;
+            searchInput.value = item.getAttribute("data-value");
+            suggestionsList.style.display = "none";
+            searchInput.form.requestSubmit ? searchInput.form.requestSubmit() : searchInput.form.submit();
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest(".search-wrapper")) {
+                suggestionsList.style.display = "none";
+            }
+        });
+
+        renderHistory();
     </script>
 </body>
 </html>
