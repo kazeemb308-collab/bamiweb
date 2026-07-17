@@ -180,27 +180,51 @@
             window.location.href = "Darkmode.html";
         }
     </script>
-    <script>
-      const searches=[
-        "Facebook",
-        "Flashscore",
-        "Youtube"];
-        const
-        input=document.getElementById("searchBox");
-        const
-        suggestions=document.getElementById("suggestions");
-        input.addEventListener("input",function(){ 
-        const value=input.value.toLowercase();
-        suggestions.innerHTML="";
-        if(value==="") return;
-        searches.forEach(function(item){
-        if(item.toLowerCase().startsWith(value)){
-        const div=document.creatorElement("div");
-        div.textContent=item;
-        suggestions.appendChild(div);
-        }
-        });
-        });
+<script>
+
+const searches=[
+"Facebook",
+"Flashscore",
+"YouTube",
+"Instagram",
+"TikTok",
+"ChatGPT",
+"Google",
+"Premier League",
+"World Cup",
+"Spotify",
+"Netflix",
+"Amazon",
+"Wikipedia"
+];
+
+const input=document.getElementById("searchBox");
+const suggestions=document.getElementById("suggestions");
+
+input.addEventListener("input",function(){
+
+const value=input.value.toLowerCase();
+
+suggestions.innerHTML="";
+
+if(value==="") return;
+
+searches.forEach(function(item){
+
+if(item.toLowerCase().startsWith(value)){
+
+const div=document.createElement("div");
+
+div.textContent=item;
+
+suggestions.appendChild(div);
+
+}
+
+});
+
+});
+
 </script>
 </body>
 </html>
