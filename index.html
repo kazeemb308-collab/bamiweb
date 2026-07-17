@@ -141,6 +141,21 @@
             color: #555;
             margin: 0 0 8px;
         }
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .clear-history-btn {
+            background: transparent;
+            border: none;
+            color: #4097ee;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+        }
         .history-list {
             display: flex;
             flex-wrap: wrap;
@@ -222,7 +237,10 @@
             <button type="submit" class="search-btn">Search</button>
         </p>
         <div id="search-history" class="history-box">
-            <p class="history-title">Recent searches</p>
+            <div class="history-header">
+                <p class="history-title">Recent searches</p>
+                <button style="color: black; background: #4097ee; border: 1px solid wheat; border-radius: 5px; padding: 5px 10px;" type="button" class="clear-history-btn" id="clear-history-btn"><b>Clear</b></button>
+            </div>
             <div id="history-list" class="history-list"></div>
         </div>
     </form>
@@ -391,6 +409,11 @@
             historyList.innerHTML = items.map(item => `<button type="button" class="history-item" data-value="${item}">${item}</button>`).join("");
         }
 
+        function clearHistory() {
+            localStorage.removeItem(historyKey);
+            renderHistory([]);
+        }
+
         function renderSuggestions(items) {
             const uniqueItems = [...new Set(items)].slice(0, 10);
             if (!uniqueItems.length) {
@@ -493,6 +516,8 @@
             suggestionsList.style.display = "none";
             searchInput.form.requestSubmit ? searchInput.form.requestSubmit() : searchInput.form.submit();
         });
+
+        document.getElementById("clear-history-btn").addEventListener("click", clearHistory);
 
         document.addEventListener("click", (event) => {
             if (!event.target.closest(".search-wrapper")) {
