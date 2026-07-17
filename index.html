@@ -87,7 +87,21 @@
             color: purple;
             text-decoration: dashed;
         }
-
+        #suggestions {
+          width: 80%;
+          margin: auto;
+          background: white;
+          border-radius: 10px;
+          overflow: hidden;
+        }
+        #suggestions div{
+          padding:12px;
+          cursor: pointer;
+          border-bottom: 1px solid #ddd;
+        }
+        #suggestions div:hover{
+          background: #f1f1f1;
+        }
     </style>
 </head>
 <body>
@@ -102,7 +116,8 @@
         <span style="color: rgba(78, 156, 78, 0.726);">B</span><span style="color: rgb(180, 96, 96);">A</span><span style="color: rgb(190, 190, 107);">M</span><span style="color: rgb(100, 100, 201);">I</span><span style="color: rgb(129, 199, 129);">w</span><span style="color: rgb(187, 125, 125);">e</span><span style="color: rgb(132, 132, 211);">b</span>
     </h1>
     <form action="https://www.google.com/search" method="get" style="text-align: center; margin-top: 20px;">
-        <input type="text" name="q" placeholder="&#128269; Search Bami web" style="width: 90%; height: 30px; font-size: 16px; max-width: 500px; padding: 12px; border-radius: 20px; border: 1px solid #dfe1e5;">&nbsp;
+        <input type="text" id="swarchBox" autocomplete="off" name="q" placeholder="&#128269; Search Bami web" style="width: 90%; height: 30px; font-size: 16px; max-width: 500px; padding: 12px; border-radius: 20px; border: 1px solid #dfe1e5;">
+        <div id="suggestions"></div>&nbsp;
         <input type="submit" value="Search" style="height: 36px; font-size: 16px; padding: 10px 25px;border-radius: 20px; background-color: #4097ee; border: 1px solid #dfe1e5; cursor: pointer;">
     </form>
    <P style="text-align: center;">
@@ -165,5 +180,24 @@
             window.location.href = "Darkmode.html";
         }
     </script>
+    <script>
+      const searches=[
+        "Facebook",
+        "Flashscore",
+        "Youtube"];
+        const
+        input=document.getElementById("searchBox");
+        const
+        suggestions=document.getElementById("suggestions");
+        input.addEventListener("input",function(){ const value=input.value.toLowercase();
+        suggestions.innerHTML="";
+        if(value==="") return;
+        searches.forEach(function(item){ const div=document.creatorElement("div");
+        div.textContent=item;
+        suggestions.appendChild(div);
+        }
+        });
+        });
+</script>
 </body>
 </html>
