@@ -573,7 +573,10 @@
             }
 
             .search-btn {
-                width: 100%;
+                width: auto;
+                padding: 0 16px;
+                height: 40px;
+                font-size: 14px;
             }
 
             .search-categories {
@@ -602,6 +605,13 @@
         @media (max-width: 480px) {
             .logo-large {
                 font-size: 36px;
+            }
+
+            .search-btn {
+                width: auto;
+                padding: 0 12px;
+                height: 36px;
+                font-size: 13px;
             }
 
             .pinned-grid {
@@ -690,8 +700,11 @@
 
         <!-- Continue Browsing -->
         <div class="continue-section">
-            <div class="section-title">
-                <i class="fas fa-history"></i> Continue Browsing
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="section-title">
+                    <i class="fas fa-history"></i> Continue Browsing
+                </div>
+                <button class="add-btn" id="clear-history-btn" style="background-color: #ff6b6b;">Clear All</button>
             </div>
             <div class="browse-grid" id="browse-grid">
                 <!-- Recent items will be added here -->
@@ -846,6 +859,11 @@
         }
 
         // Load Browse History
+        function clearBrowseHistory() {
+            localStorage.removeItem(HISTORY_KEY);
+            loadBrowseHistory();
+        }
+
         function loadBrowseHistory() {
             const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
             const grid = document.getElementById('browse-grid');
@@ -857,18 +875,23 @@
 
             grid.innerHTML = '';
             history.slice(0, 6).forEach(item => {
-                const link = document.createElement('a');
-                link.className = 'browse-item';
-                link.href = item.url;
-                link.target = '_blank';
-                link.innerHTML = `
-                    <div class="browse-icon"><i class="${item.icon}"></i></div>
-                    <div class="browse-text">
-                        <div class="browse-title">${item.title}</div>
-                        <div class="browse-url">${new URL(item.url).hostname}</div>
-                    </div>
-                `;
-                grid.appendChild(link);
+                try {
+                    const link = document.createElement('a');
+                    link.className = 'browse-item';
+                    link.href = item.url;
+                    link.target = '_blank';
+                    const hostname = new URL(item.url).hostname || 'Link';
+                    link.innerHTML = `
+                        <div class="browse-icon"><i class="${item.icon}"></i></div>
+                        <div class="browse-text">
+                            <div class="browse-title">${item.title}</div>
+                            <div class="browse-url">${hostname}</div>
+                        </div>
+                    `;
+                    grid.appendChild(link);
+                } catch (e) {
+                    console.error('Error rendering history item:', e);
+                }
             });
         }
 
@@ -1043,6 +1066,8 @@
             document.getElementById('add-pin-btn').addEventListener('click', () => {
                 document.getElementById('pin-modal').classList.add('show');
             });
+
+            document.getElementById('clear-history-btn').addEventListener('click', clearBrowseHistory);
 
             document.getElementById('pin-cancel-btn').addEventListener('click', () => {
                 document.getElementById('pin-modal').classList.remove('show');
