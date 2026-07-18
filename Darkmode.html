@@ -1,10 +1,10 @@
-</DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html>
-<head style="background-color: black; color: white;">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <title>Bamiweb</title>
+    <title>Bamiweb - Your Personal Search Hub</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
@@ -12,74 +12,116 @@
         try{ sessionStorage.setItem('bami-theme','dark'); }catch(e){}
     </script>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            font-family: 'Roboto', sans-serif;
-            background-color: #000000;
-            color: #ffffff;
+            box-sizing: border-box;
         }
-        .navbar {
-            background-color: #000000;
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0a0a0a;
             color: #ffffff;
-            overflow: hidden;
+            overflow-x: hidden;
+        }
+
+        /* Browser Header */
+        .browser-header {
+            background-color: #1a1a1a;
+            border-bottom: 1px solid #333333;
+            padding: 12px 20px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 10px 0;
+            justify-content: space-between;
             position: sticky;
             top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
-        .navbar a {
+
+        .browser-logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             color: #ffffff;
-            text-decoration: none;
-            padding: 14px 12px;
+        }
+
+        .browser-logo span:nth-child(1) { color: rgba(78, 156, 78, 0.726); }
+        .browser-logo span:nth-child(2) { color: rgb(180, 96, 96); }
+        .browser-logo span:nth-child(3) { color: rgb(190, 190, 107); }
+        .browser-logo span:nth-child(4) { color: rgb(100, 100, 201); }
+        .browser-logo span:nth-child(5) { color: rgb(129, 199, 129); }
+        .browser-logo span:nth-child(6) { color: rgb(187, 125, 125); }
+        .browser-logo span:nth-child(7) { color: rgb(132, 132, 211); }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-controls button {
+            background: transparent;
+            border: none;
+            color: #ffffff;
             font-size: 16px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
         }
-        .navbar a:hover {
-            background-color: #ffffff;
-            color: #000000;
+
+        .header-controls button:hover {
+            background-color: #333333;
         }
-        a:hover {
-            background-color: #ffffff;
-            color: #9c27b0;
-            text-decoration: dashed;
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        h1 {
+
+        /* Search Section */
+        .search-section {
             text-align: center;
-            margin-top: 50px;
-            font-size: 50px;
-            font-family: 'Roboto', sans-serif;
-            padding: 30px;
+            margin: 40px 0;
         }
-        div {
-            font-family: 'Roboto', sans-serif;
-            font-size: 10px;
-            text-align: center;
-            margin-top: 20px;
+
+        .logo-large {
+            font-size: 72px;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+            letter-spacing: 4px;
         }
+
         .search-form {
-            text-align: center;
-            margin-top: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 20px;
         }
+
         .search-row {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            width: min(92%, 700px);
-            margin: 0 auto;
+            gap: 12px;
+            width: 100%;
+            max-width: 700px;
         }
+
         .search-wrapper {
             position: relative;
             flex: 1;
             min-width: 280px;
-            max-width: 600px;
         }
+
         .search-input {
             width: 100%;
             height: 48px;
@@ -87,245 +129,658 @@
             padding: 12px 16px;
             border-radius: 999px;
             border: 2px solid #5a8dff;
-            box-sizing: border-box;
+            background-color: transparent;
+            color: #ffffff;
             outline: none;
-            color: white;
-            background-color: rgb(8, 4, 31);
-            margin-right: 70px;
-            box-shadow: 0 0 15px rgba(90, 141, 255, .6);
-            background: transparent;
-            flex: 1;
-            }
+            box-shadow: 0 0 15px rgba(90, 141, 255, 0.6);
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: #999999;
+        }
+
         .search-input:focus {
             border-color: #4097ee;
             box-shadow: 0 0 0 3px rgba(64, 151, 238, 0.2);
         }
+
         .search-btn {
-            width: min-content;
             height: 48px;
-            padding: 0 18px;
+            padding: 0 24px;
             border-radius: 999px;
             background-color: #4097ee;
             color: #ffffff;
-            border: 1px solid #333333;
+            border: none;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
-            margin-top: 5px;
+            transition: background-color 0.3s;
         }
+
+        .search-btn:hover {
+            background-color: #3077cc;
+        }
+
+        /* Suggestions Dropdown */
         .suggestions-list {
             display: none;
-            position: sticky;
-            top: calc(100% + 6px);
+            position: absolute;
+            top: 100%;
             left: 0;
             right: 0;
-            background: #111111;
+            background: #1a1a1a;
             border: 1px solid #333333;
             border-radius: 12px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-            max-height: 240px;
+            border-top: none;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            max-height: 300px;
             overflow-y: auto;
-            padding: 6px 0;
+            margin-top: -1px;
         }
+
         .suggestion-item {
-            padding: 10px 14px;
+            padding: 12px 16px;
             cursor: pointer;
             font-size: 14px;
             color: #ffffff;
+            border-bottom: 1px solid #222222;
+            transition: background-color 0.2s;
         }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
         .suggestion-item:hover {
-            background-color: #1f1f1f;
+            background-color: #252525;
         }
-        .history-box {
-            width: min(92%, 600px);
-            background: #111111;
+
+        /* Search Categories */
+        .search-categories {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .category-btn {
+            background-color: #1a1a1a;
             border: 1px solid #333333;
-            border-radius: 12px;
-            padding: 10px 12px;
-            box-shadow: 0 2px 6px rgba(255, 255, 255, 0.04);
-            text-align: left;
-        }
-        .history-title {
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
             font-size: 13px;
-            font-weight: 700;
-            color: #cccccc;
-            margin: 0 0 8px;
+            transition: all 0.3s;
         }
-        .history-header {
+
+        .category-btn:hover {
+            background-color: #252525;
+            border-color: #4097ee;
+            color: #4097ee;
+        }
+
+        /* Pinned Websites */
+        .pinned-section {
+            margin: 40px 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #cccccc;
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 8px;
-            margin-bottom: 8px;
         }
-        .clear-history-btn {
-            background: transparent;
+
+        .add-btn {
+            background-color: #4097ee;
+            color: white;
             border: none;
-            color: #4097ee;
-            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            padding: 0;
+            font-size: 12px;
+            transition: background-color 0.3s;
         }
-        .history-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+
+        .add-btn:hover {
+            background-color: #3077cc;
         }
-        .history-item {
+
+        .pinned-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 16px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .pinned-card {
             background: #1a1a1a;
             border: 1px solid #333333;
-            border-radius: 999px;
-            padding: 6px 10px;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 140px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .pinned-card:hover {
+            background: #252525;
+            border-color: #4097ee;
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(64, 151, 238, 0.2);
+        }
+
+        .pinned-icon {
+            font-size: 32px;
+            color: #4097ee;
+        }
+
+        .pinned-name {
+            font-size: 12px;
+            color: #cccccc;
+            font-weight: 600;
+        }
+
+        .pinned-card-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: transparent;
+            border: none;
+            color: #ff6b6b;
+            font-size: 14px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pinned-card:hover .pinned-card-remove {
+            opacity: 1;
+        }
+
+        /* Continue Browsing Section */
+        .continue-section {
+            margin: 40px 0;
+        }
+
+        .browse-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .browse-item {
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .browse-item:hover {
+            background: #252525;
+            border-color: #4097ee;
+        }
+
+        .browse-icon {
+            font-size: 20px;
+            color: #4097ee;
+        }
+
+        .browse-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .browse-title {
             font-size: 13px;
             color: #ffffff;
-            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .history-item:hover {
-            background: #222222;
+
+        .browse-url {
+            font-size: 11px;
+            color: #999999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .trending-section {
-            background-color: #111111;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 800px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.06);
+
+        /* Widgets Section */
+        .widgets-section {
+            margin: 40px 0;
         }
-        .trending-section h2 {
+
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .widget {
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .widget-title {
+            font-size: 12px;
+            color: #999999;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .widget-value {
             font-size: 24px;
+            font-weight: 700;
+            color: #4097ee;
+            margin-bottom: 4px;
+        }
+
+        .widget-detail {
+            font-size: 11px;
+            color: #666666;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 20px;
+            color: #666666;
+            font-size: 12px;
+            border-top: 1px solid #222222;
+        }
+
+        .footer-links {
             margin-bottom: 10px;
-            color: #ffffff;
         }
-        .trending-section ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .trending-section ul li {
-            margin: 5px 0;
-            font-size: 18px;
+
+        .footer-links a {
+            color: #4097ee;
             text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #6bb3ff;
+        }
+
+        .light-mode-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4097ee;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 12px rgba(64, 151, 238, 0.3);
+            z-index: 999;
+        }
+
+        .light-mode-btn:hover {
+            background-color: #3077cc;
+        }
+
+        /* Modal for Adding Pins */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .modal-group {
+            margin-bottom: 12px;
+        }
+
+        .modal-label {
+            font-size: 12px;
+            color: #999999;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: #252525;
+            border: 1px solid #333333;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-cancel {
+            background: #252525;
             color: #ffffff;
         }
-        .trending-section ul li:hover {
-            background-color: #1f1f1f;
+
+        .modal-btn-save {
+            background: #4097ee;
             color: #ffffff;
-            text-decoration: dashed;
         }
-        @media (max-width: 600px) {
+
+        .modal-btn-save:hover {
+            background: #3077cc;
+        }
+
+        .no-items-message {
+            text-align: center;
+            color: #666666;
+            font-size: 14px;
+            padding: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .browser-header {
+                padding: 10px 15px;
+            }
+
+            .browser-logo {
+                font-size: 18px;
+            }
+
+            .logo-large {
+                font-size: 48px;
+                margin-bottom: 30px;
+            }
+
             .search-row {
                 flex-direction: column;
-                gap: 8px;
+                max-width: 90%;
             }
-            .search-wrapper {
-                width: 100%;
-                min-width: 0;
-            }
+
             .search-btn {
                 width: 100%;
-                max-width: 220px;
+            }
+
+            .search-categories {
+                gap: 8px;
+            }
+
+            .category-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .pinned-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 12px;
+            }
+
+            .browse-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .widgets-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-large {
+                font-size: 36px;
+            }
+
+            .pinned-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .pinned-card {
+                min-height: 120px;
+                padding: 12px 8px;
+            }
+
+            .pinned-icon {
+                font-size: 24px;
+            }
+
+            .pinned-name {
+                font-size: 11px;
+            }
+
+            .widgets-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .light-mode-btn {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px 14px;
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="index.html">Home</a>
-        <a href="images.html">Images</a>
-        <a href="news.html">News</a>
-        <a href="videos.html">Videos</a>
-        <a href="map.html">Maps</a>
-    </div>
-    <h1>
-        <span style="color: rgba(78, 156, 78, 0.726);">B</span><span style="color: rgb(180, 96, 96);">A</span><span style="color: rgb(190, 190, 107);">M</span><span style="color: rgb(100, 100, 201);">I</span><span style="color: rgb(129, 199, 129);">w</span><span style="color: rgb(187, 125, 125);">e</span><span style="color: rgb(132, 132, 211);">b</span>
-    </h1>
-    <form id="search-form" class="search-form" action="https://www.google.com/search" method="get">
-        <div class="search-row">
-            <p class="search-wrapper">
-                <input id="search-input" class="search-input" type="text" name="q" placeholder="🔍 Search Bami web" autocomplete="off">
-                <div id="suggestions-list" class="suggestions-list"></div>
-            </div>
-            <button type="submit" class="search-btn">Search</button>
-        </p>
-        <div id="search-history" class="history-box">
-            <div class="history-header">
-                <p class="history-title">Recent searches</p>
-                <button style="color: white;background: #4097ee; border: 1px solid none; border-radius: 5px; padding: 5px 10px;" type="button" class="clear-history-btn" id="clear-history-btn"><b>Clear</b></button>
-            </div>
-            <div id="history-list" class="history-list"></div>
+    <!-- Browser Header -->
+    <div class="browser-header">
+        <div class="browser-logo">
+            <span>B</span><span>A</span><span>M</span><span>I</span><span>w</span><span>e</span><span>b</span>
         </div>
-    </form>
-   <P style="text-align: center;">
-    <a href="https://www.facebook.com/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
-        <i class="fa-brands fa-facebook" style="font-size: 40px; color: #1877f2;"></i></a>&nbsp;&nbsp;&nbsp;
-            <a href="https://www.instagram.com/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
-                <i class="fa-brands fa-instagram" style="font-size: 40px; color: #e1306c;"></i></a>&nbsp;&nbsp;&nbsp;
-                    <a href="https://www.tiktok.com/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
-                        <i class="fa-brands fa-tiktok" style="font-size: 40px; color: white;"></i></a>&nbsp;&nbsp;&nbsp;
-            <a href="https://www.twitter.com/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
-                    <i class="fa-brands fa-twitter" style="font-size: 40px; color: #1da1f2;"></i></a>&nbsp;&nbsp;&nbsp;
-                    <a href="https://www.linkedin.com/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
-                        <i class="fa-brands fa-linkedin" style="font-size: 40px; color: #0077b5;"></i></a>&nbsp;&nbsp;&nbsp;
-                        <a href="https://www.youtube.com/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
-                            <i class="fa-brands fa-youtube" style="font-size: 40px; color: #ff0000;"></i></a>&nbsp;&nbsp;&nbsp;
-                            <a href="https://www.pinterest.com/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
-                                <i class="fa-brands fa-pinterest" style="font-size: 40px; color: #bd081c;"></i> </a>&nbsp;&nbsp;&nbsp;
-                                <a href="https://www.amazon.com/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
-                                    <i class="fa-brands fa-amazon" style="font-size: 40px; color: #ff9900;"></i> </a>&nbsp;&nbsp;&nbsp;
-                                    <a href="https://www.wikipedia.org/" target="_blank" style="display: inline-block; margin-top: 20px; text-decoration: none; color: #3b5998; font-size: 24px;">
-                                        <i class="fa-brands fa-wikipedia-w" style="font-size: 40px; color: #1877f2;"></i> </a>&nbsp;&nbsp;&nbsp;
-                                </P>
-    <br>
-    <p class="trending-section">
-        <h2 style="color: white;">Trending Searches</h2>
-        <ul>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=latest+tech+news" target="_blank" style="text-decoration: none;">&#10548; Latest Tech News</a></li><br>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=top+movies+2026" target="_blank" style="text-decoration: none;">&#10548; Top Movies 2026</a></li><br>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=popular+songs+2026" target="_blank" style="text-decoration: none;">&#10548; Popular Songs 2026</a></li><br>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=best+travel+destinations" target="_blank" style="text-decoration: none;">&#10548; Best Travel Destinations</a></li><br>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=healthy+recipes" target="_blank" style="text-decoration: none;">&#10548; Healthy Recipes</a></li><br>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=world+cup+2026" target="_blank" style="text-decoration: none;">&#10548; World Cup 2026</a></li><br>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=best+fitness+exercises" target="_blank" style="text-decoration: none;">&#10548; Best Fitness Exercises</a></li><br>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=best+cooking+recipes" target="_blank" style="text-decoration: none;">&#10548; Best Cooking Recipes</a></li><br>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=best+home+decor" target="_blank" style="text-decoration: none;">&#10548; Best Home Decor</a></li><br>
-            <li><a style="color: white; text-decoration: none;" href="https://www.google.com/search?q=best+smart+home+devices" target="_blank" style="text-decoration: none;">&#10548; Best Smart Home Devices</a></li><br>
-            <hr>
-        </ul>   
-    </p>
-    <div>
-        <p style="color: white;">&#127757;Connecting you to the best content across the web.</p>
-    </div> 
-    <p style="text-align: center;color:rgb(100, 100, 201);">© 2026 Bamiweb. All rights reserved.</p>
-    <footer style="text-align: center; margin-top: 20px; font-family: 'Roboto', sans-serif; font-size: 12px;">
-        <p style="color: white;">Contact us: <a style="text-decoration: none; color: white;" href="mailto:kazeemb308@gmail.com" style="color: white;">kazeemb308@gmail.com</a></p>
-        <p style="color: white;">
-            <a style="text-decoration: none; color: white;" href="privacy-dark.html" style="color: white;">Privacy Policy</a> &nbsp;&nbsp;
-            <a style="text-decoration: none; color: white;" href="terms-dark.html" style="color: white;">Terms of Service</a>
-        </p>
-        <p style="color: white;">
-            <a style="text-decoration: none; color: white;" href="about-dark.html" style="color: white;">About Us</a> &nbsp;&nbsp;
-            <a style="text-decoration: none; color: white;" href="help-dark.html" style="color: white;">Help</a>
-        </p>
-    </footer>
-    <button onclick="lightMode()" style="position: fixed; bottom: 20px; right: 20px; background-color: #4097ee; color: white; padding: 10px 15px; border-radius: 5px; border: 1px solid #333; text-decoration: none;">Light Mode</button>
+        <div class="header-controls">
+            <button title="Refresh" id="refresh-btn"><i class="fas fa-redo"></i></button>
+            <button title="Settings" id="settings-btn"><i class="fas fa-cog"></i></button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="logo-large">
+                <span style="color: rgba(78, 156, 78, 0.726);">B</span><span style="color: rgb(180, 96, 96);">A</span><span style="color: rgb(190, 190, 107);">M</span><span style="color: rgb(100, 100, 201);">I</span><span style="color: rgb(129, 199, 129);">w</span><span style="color: rgb(187, 125, 125);">e</span><span style="color: rgb(132, 132, 211);">b</span>
+            </div>
+
+            <form id="search-form" class="search-form" action="https://www.google.com/search" method="get">
+                <div class="search-row">
+                    <div class="search-wrapper">
+                        <input id="search-input" class="search-input" type="text" name="q" placeholder="🔍 Search anything..." autocomplete="off">
+                        <div id="suggestions-list" class="suggestions-list"></div>
+                    </div>
+                    <button type="submit" class="search-btn">Search</button>
+                </div>
+
+                <!-- Search Categories -->
+                <div class="search-categories" id="search-categories">
+                    <button type="button" class="category-btn" data-category="all">All</button>
+                    <button type="button" class="category-btn" data-category="images">Images</button>
+                    <button type="button" class="category-btn" data-category="news">News</button>
+                    <button type="button" class="category-btn" data-category="videos">Videos</button>
+                    <button type="button" class="category-btn" data-category="shopping">Shopping</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Pinned Websites -->
+        <div class="pinned-section">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="section-title">
+                    <i class="fas fa-thumbtack"></i> Pinned Websites
+                </div>
+                <button class="add-btn" id="add-pin-btn">+ Add Website</button>
+            </div>
+            <div class="pinned-grid" id="pinned-grid">
+                <!-- Pinned cards will be added here -->
+            </div>
+        </div>
+
+        <!-- Continue Browsing -->
+        <div class="continue-section">
+            <div class="section-title">
+                <i class="fas fa-history"></i> Continue Browsing
+            </div>
+            <div class="browse-grid" id="browse-grid">
+                <!-- Recent items will be added here -->
+            </div>
+        </div>
+
+        <!-- Widgets -->
+        <div class="widgets-section">
+            <div class="section-title">
+                <i class="fas fa-widget"></i> Quick Info
+            </div>
+            <div class="widgets-grid">
+                <div class="widget">
+                    <div class="widget-title">Time</div>
+                    <div class="widget-value" id="time-widget">--:--</div>
+                    <div class="widget-detail" id="date-widget">Loading...</div>
+                </div>
+                <div class="widget">
+                    <div class="widget-title">Weather</div>
+                    <div class="widget-value" id="weather-widget">--°C</div>
+                    <div class="widget-detail" id="weather-detail">Loading...</div>
+                </div>
+                <div class="widget">
+                    <div class="widget-title">USD/EUR</div>
+                    <div class="widget-value" id="currency-widget">--</div>
+                    <div class="widget-detail" id="currency-detail">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-links">
+                <a href="privacy-dark.html">Privacy Policy</a>
+                <a href="terms-dark.html">Terms of Service</a>
+                <a href="about-dark.html">About Us</a>
+                <a href="help-dark.html">Help</a>
+            </div>
+            <p>© 2026 Bamiweb. All rights reserved. | Contact: kazeemb308@gmail.com</p>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Pins -->
+    <div class="modal" id="pin-modal">
+        <div class="modal-content">
+            <div class="modal-title">Add Website Shortcut</div>
+            <div class="modal-group">
+                <label class="modal-label">Website Name</label>
+                <input class="modal-input" type="text" id="pin-name" placeholder="e.g., Google">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">Website URL</label>
+                <input class="modal-input" type="text" id="pin-url" placeholder="https://example.com">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">Icon (Font Awesome)</label>
+                <input class="modal-input" type="text" id="pin-icon" placeholder="fa-google (without 'fa-brands' or 'fa-solid')">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="pin-cancel-btn">Cancel</button>
+                <button class="modal-btn modal-btn-save" id="pin-save-btn">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Light Mode Button -->
+    <button class="light-mode-btn" onclick="lightMode()">Light Mode</button>
+
+    <!-- Scripts -->
     <script>
-        function lightMode() {
-            localStorage.setItem("theme", "light");
-            try{ sessionStorage.removeItem('bami-theme'); }catch(e){}
-            window.location.href = "index.html";
-        }
-    </script>
-    <script>
-        if (localStorage.getItem("theme") === "light") {
-            window.location.href = "index.html";
-        }
-    </script>
-    <script>
-        const searchForm = document.getElementById("search-form");
-        const searchInput = document.getElementById("search-input");
-        const suggestionsList = document.getElementById("suggestions-list");
-        const historyList = document.getElementById("history-list");
-        const historyKey = "bamiweb-search-history";
+        // Local Storage Keys
+        const PINNED_KEY = 'bamiweb-pinned-sites';
+        const HISTORY_KEY = 'bamiweb-browse-history';
+
+        // Default Pinned Websites
+        const defaultPins = [
+            { name: 'Google', url: 'https://www.google.com', icon: 'fa-google' },
+            { name: 'YouTube', url: 'https://www.youtube.com', icon: 'fa-youtube' },
+            { name: 'Wikipedia', url: 'https://www.wikipedia.org', icon: 'fa-wikipedia-w' },
+            { name: 'GitHub', url: 'https://www.github.com', icon: 'fa-github' },
+            { name: 'Facebook', url: 'https://www.facebook.com', icon: 'fa-facebook' },
+            { name: 'Twitter', url: 'https://www.twitter.com', icon: 'fa-twitter' },
+        ];
+
+        // Search Suggestions (fallback)
         const fallbackSuggestions = [
             "latest tech news",
             "world news today",
@@ -344,120 +799,178 @@
             "latest fashion trends",
             "top video games 2026",
             "how to learn programming",
-            "best coding languages to learn",
+            "best coding languages",
             "what is AI",
-            "who is Elon Musk",
-            "how to start a blog",
-            "how to make money online",
-            "best laptop for students",
-            "best smartphones 2026",
-            "latest crypto news",
-            "weather today",
-            "new movies this week",
-            "football live scores",
-            "healthy breakfast ideas",
-            "travel tips for europe",
-            "website design inspiration",
-            "free online courses",
-            "best productivity apps",
-            "remote jobs worldwide",
-            "digital nomad guide",
-            "stock market today",
-            "travel visa information",
-            "www.facebook.com",
-            "www.instagram.com",
-            "www.tiktok.com",
-            "www.twitter.com",
-            "www.linkedin.com",
-            "www.youtube.com",
-            "www.pinterest.com",
-            "www.amazon.com",
-            "www.wikipedia.org",
-            "www.netflix.com",
-            "www.google.com",
-            "www.bbc.com",
-            "www.cnn.com",
-            "www.reuters.com",
-            "www.nytimes.com",
-            "www.bing.com",
-            "www.yahoo.com",
-            "www.duckduckgo.com",
-            "www.reddit.com",
-            "www.quora.com",
-            "www.stackoverflow.com",
-            "www.medium.com",
-            "www.spotify.com",
-            "www.twitch.tv",
-            "www.imdb.com",
-            "www.weather.com"
+            "how to make money online"
         ];
+
+        // Initialize
+        function init() {
+            loadPinnedSites();
+            loadBrowseHistory();
+            updateWidgets();
+            setupEventListeners();
+            setInterval(updateWidgets, 60000);
+        }
+
+        // Load Pinned Sites
+        function loadPinnedSites() {
+            let pins = JSON.parse(localStorage.getItem(PINNED_KEY)) || defaultPins;
+            const grid = document.getElementById('pinned-grid');
+            grid.innerHTML = '';
+
+            pins.forEach((pin, index) => {
+                const card = document.createElement('a');
+                card.className = 'pinned-card';
+                card.href = pin.url;
+                card.target = '_blank';
+                card.innerHTML = `
+                    <div class="pinned-icon"><i class="fa-brands ${pin.icon}"></i></div>
+                    <div class="pinned-name">${pin.name}</div>
+                    <button class="pinned-card-remove" onclick="removePinnedSite(event, ${index})" title="Remove">×</button>
+                `;
+                grid.appendChild(card);
+            });
+
+            const addCard = document.createElement('div');
+            addCard.className = 'pinned-card';
+            addCard.style.cursor = 'pointer';
+            addCard.innerHTML = '<div style="font-size: 32px; color: #4097ee;">+</div><div class="pinned-name">Add More</div>';
+            addCard.onclick = () => document.getElementById('pin-modal').classList.add('show');
+            grid.appendChild(addCard);
+        }
+
+        function removePinnedSite(e, index) {
+            e.preventDefault();
+            e.stopPropagation();
+            let pins = JSON.parse(localStorage.getItem(PINNED_KEY)) || defaultPins;
+            pins.splice(index, 1);
+            localStorage.setItem(PINNED_KEY, JSON.stringify(pins));
+            loadPinnedSites();
+        }
+
+        // Load Browse History
+        function loadBrowseHistory() {
+            const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            const grid = document.getElementById('browse-grid');
+            
+            if (history.length === 0) {
+                grid.innerHTML = '<div class="no-items-message">No recent items. Start browsing to see history here.</div>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            history.slice(0, 6).forEach(item => {
+                const link = document.createElement('a');
+                link.className = 'browse-item';
+                link.href = item.url;
+                link.target = '_blank';
+                link.innerHTML = `
+                    <div class="browse-icon"><i class="${item.icon}"></i></div>
+                    <div class="browse-text">
+                        <div class="browse-title">${item.title}</div>
+                        <div class="browse-url">${new URL(item.url).hostname}</div>
+                    </div>
+                `;
+                grid.appendChild(link);
+            });
+        }
+
+        function addToHistory(title, url) {
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            const item = {
+                title: title || 'Untitled',
+                url: url,
+                icon: 'fas fa-globe',
+                timestamp: Date.now()
+            };
+            history.unshift(item);
+            history = history.slice(0, 20);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        }
+
+        // Update Widgets
+        function updateWidgets() {
+            updateTime();
+            updateWeather();
+            updateCurrency();
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            const date = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            document.getElementById('time-widget').textContent = time;
+            document.getElementById('date-widget').textContent = date;
+        }
+
+        function updateWeather() {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const { latitude, longitude } = pos.coords;
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=celsius`)
+                    .then(r => r.json())
+                    .then(data => {
+                        const temp = Math.round(data.current.temperature_2m);
+                        const condition = getWeatherCondition(data.current.weather_code);
+                        document.getElementById('weather-widget').textContent = `${temp}°C`;
+                        document.getElementById('weather-detail').textContent = condition;
+                    })
+                    .catch(() => {
+                        document.getElementById('weather-widget').textContent = 'N/A';
+                        document.getElementById('weather-detail').textContent = 'Weather unavailable';
+                    });
+            }, () => {
+                document.getElementById('weather-widget').textContent = 'N/A';
+                document.getElementById('weather-detail').textContent = 'Location access denied';
+            });
+        }
+
+        function getWeatherCondition(code) {
+            const conditions = {
+                0: 'Clear',
+                1: 'Mostly Clear',
+                2: 'Partly Cloudy',
+                3: 'Overcast',
+                45: 'Foggy',
+                51: 'Light Drizzle',
+                61: 'Rainy',
+                71: 'Snowy',
+                80: 'Heavy Rain',
+                95: 'Thunderstorm'
+            };
+            return conditions[code] || 'Unknown';
+        }
+
+        function updateCurrency() {
+            fetch('https://api.exchangerate-api.com/v4/latest/USD')
+                .then(r => r.json())
+                .then(data => {
+                    const rate = data.rates.EUR.toFixed(2);
+                    document.getElementById('currency-widget').textContent = rate;
+                    document.getElementById('currency-detail').textContent = '1 USD = EUR';
+                })
+                .catch(() => {
+                    document.getElementById('currency-widget').textContent = 'N/A';
+                    document.getElementById('currency-detail').textContent = 'Rate unavailable';
+                });
+        }
+
+        // Search Functionality
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const suggestionsList = document.getElementById('suggestions-list');
         let activeRequestId = 0;
         let pendingScript = null;
 
-        function getHistory() {
-            try {
-                return JSON.parse(localStorage.getItem(historyKey)) || [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function saveSearch(query) {
-            const value = query.trim();
-            if (!value) return;
-
-            const history = getHistory();
-            const updated = [value, ...history.filter(item => item.toLowerCase() !== value.toLowerCase())].slice(0, 8);
-            localStorage.setItem(historyKey, JSON.stringify(updated));
-            renderHistory(updated);
-        }
-
-        function renderHistory(items = getHistory()) {
-            if (!items.length) {
-                historyList.innerHTML = '<span class="history-item">No recent searches yet</span>';
-                return;
-            }
-
-            historyList.innerHTML = items.map(item => `<button type="button" class="history-item" data-value="${item}">${item}</button>`).join("");
-        }
-
-        function clearHistory() {
-            localStorage.removeItem(historyKey);
-            renderHistory([]);
-        }
-
-        function renderSuggestions(items) {
-            const uniqueItems = [...new Set(items)].slice(0, 10);
-            if (!uniqueItems.length) {
-                suggestionsList.innerHTML = "";
-                suggestionsList.style.display = "none";
-                return;
-            }
-
-            suggestionsList.innerHTML = "";
-            const fragment = document.createDocumentFragment();
-            uniqueItems.forEach((item) => {
-                const suggestionItem = document.createElement("div");
-                suggestionItem.className = "suggestion-item";
-                suggestionItem.textContent = item;
-                suggestionItem.dataset.value = item;
-                fragment.appendChild(suggestionItem);
-            });
-            suggestionsList.appendChild(fragment);
-            suggestionsList.style.display = "block";
-        }
-
         function getLocalSuggestions(query) {
             const q = query.trim().toLowerCase();
-            return q
-                ? fallbackSuggestions.filter(item => item.toLowerCase().includes(q)).slice(0, 8)
-                : fallbackSuggestions.slice(0, 8);
+            return q ? fallbackSuggestions.filter(item => item.toLowerCase().includes(q)) : fallbackSuggestions.slice(0, 8);
         }
 
         function showSuggestions() {
             const query = searchInput.value.trim();
             if (!query) {
-                renderSuggestions([]);
+                suggestionsList.style.display = 'none';
                 return;
             }
 
@@ -479,65 +992,124 @@
                 renderSuggestions(combined);
             };
 
-            const script = document.createElement("script");
+            const script = document.createElement('script');
             script.src = `https://suggestqueries.google.com/complete/search?client=firefox&hl=en&q=${encodeURIComponent(query)}&callback=${callbackName}`;
             script.async = true;
             script.onerror = () => {
-                if (requestId === activeRequestId) {
-                    renderSuggestions(localMatches);
-                }
+                if (requestId === activeRequestId) renderSuggestions(localMatches);
             };
 
-            if (pendingScript) {
-                pendingScript.remove();
-            }
+            if (pendingScript) pendingScript.remove();
             document.body.appendChild(script);
             pendingScript = script;
 
-            setTimeout(() => {
-                if (script.parentNode) {
-                    script.parentNode.removeChild(script);
-                }
-            }, 4000);
+            setTimeout(() => { if (script.parentNode) script.parentNode.removeChild(script); }, 4000);
         }
 
-        searchInput.addEventListener("input", showSuggestions);
-        searchInput.addEventListener("focus", showSuggestions);
-
-        searchForm.addEventListener("submit", (event) => {
-            const value = searchInput.value.trim();
-            if (!value) {
-                event.preventDefault();
+        function renderSuggestions(items) {
+            const uniqueItems = [...new Set(items)].slice(0, 10);
+            if (!uniqueItems.length) {
+                suggestionsList.style.display = 'none';
                 return;
             }
-            saveSearch(value);
-        });
 
-        suggestionsList.addEventListener("click", (event) => {
-            const item = event.target.closest(".suggestion-item");
-            if (!item) return;
-            searchInput.value = item.getAttribute("data-value");
-            suggestionsList.style.display = "none";
-            searchInput.form.requestSubmit ? searchInput.form.requestSubmit() : searchInput.form.submit();
-        });
+            suggestionsList.innerHTML = '';
+            uniqueItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = item;
+                div.onclick = () => {
+                    searchInput.value = item;
+                    searchForm.submit();
+                };
+                suggestionsList.appendChild(div);
+            });
+            suggestionsList.style.display = 'block';
+        }
 
-        historyList.addEventListener("click", (event) => {
-            const item = event.target.closest(".history-item");
-            if (!item || item.textContent === "No recent searches yet") return;
-            searchInput.value = item.getAttribute("data-value");
-            suggestionsList.style.display = "none";
-            searchInput.form.requestSubmit ? searchInput.form.requestSubmit() : searchInput.form.submit();
-        });
+        // Event Listeners
+        function setupEventListeners() {
+            searchInput.addEventListener('input', showSuggestions);
+            searchInput.addEventListener('focus', showSuggestions);
 
-        document.getElementById("clear-history-btn").addEventListener("click", clearHistory);
+            searchForm.addEventListener('submit', (e) => {
+                const value = searchInput.value.trim();
+                if (!value) e.preventDefault();
+                addToHistory('Search: ' + value, `https://www.google.com/search?q=${encodeURIComponent(value)}`);
+            });
 
-        document.addEventListener("click", (event) => {
-            if (!event.target.closest(".search-wrapper")) {
-                suggestionsList.style.display = "none";
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-wrapper')) {
+                    suggestionsList.style.display = 'none';
+                }
+            });
+
+            document.getElementById('add-pin-btn').addEventListener('click', () => {
+                document.getElementById('pin-modal').classList.add('show');
+            });
+
+            document.getElementById('pin-cancel-btn').addEventListener('click', () => {
+                document.getElementById('pin-modal').classList.remove('show');
+            });
+
+            document.getElementById('pin-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'pin-modal') document.getElementById('pin-modal').classList.remove('show');
+            });
+
+            document.getElementById('pin-save-btn').addEventListener('click', addNewPin);
+
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const category = btn.dataset.category;
+                    searchInput.value = category !== 'all' ? `${searchInput.value} ${category}` : searchInput.value;
+                    searchInput.focus();
+                });
+            });
+
+            document.getElementById('refresh-btn').addEventListener('click', () => {
+                location.reload();
+            });
+        }
+
+        function addNewPin() {
+            const name = document.getElementById('pin-name').value.trim();
+            const url = document.getElementById('pin-url').value.trim();
+            const icon = document.getElementById('pin-icon').value.trim() || 'fa-globe';
+
+            if (!name || !url) {
+                alert('Please fill in name and URL');
+                return;
             }
-        });
 
-        renderHistory();
+            if (!url.startsWith('http')) {
+                alert('URL must start with http:// or https://');
+                return;
+            }
+
+            let pins = JSON.parse(localStorage.getItem(PINNED_KEY)) || defaultPins;
+            pins.push({ name, url, icon });
+            localStorage.setItem(PINNED_KEY, JSON.stringify(pins));
+
+            document.getElementById('pin-name').value = '';
+            document.getElementById('pin-url').value = '';
+            document.getElementById('pin-icon').value = '';
+            document.getElementById('pin-modal').classList.remove('show');
+
+            loadPinnedSites();
+        }
+
+        function lightMode() {
+            localStorage.setItem('theme', 'light');
+            try{ sessionStorage.removeItem('bami-theme'); }catch(e){}
+            window.location.href = 'index.html';
+        }
+
+        if (localStorage.getItem('theme') === 'light') {
+            window.location.href = 'index.html';
+        }
+
+        init();
     </script>
 </body>
 </html>
