@@ -678,13 +678,13 @@
                 <span style="color: rgba(78, 156, 78, 0.726);">B</span><span style="color: rgb(180, 96, 96);">A</span><span style="color: rgb(190, 190, 107);">M</span><span style="color: rgb(100, 100, 201);">I</span><span style="color: rgb(129, 199, 129);">w</span><span style="color: rgb(187, 125, 125);">e</span><span style="color: rgb(132, 132, 211);">b</span>
             </div>
 
-            <form id="search-form" class="search-form" action="https://www.google.com/search" method="get">
+            <form id="search-form" class="search-form" action="https://www.google.com/search" method="get" target="_blank">
                 <div class="search-row">
                     <div class="search-wrapper">
                         <input id="search-input" class="search-input" type="text" name="q" placeholder="🔍 Search anything..." autocomplete="off">
                         <div id="suggestions-list" class="suggestions-list"></div>
                     </div>
-                    <button type="submit" class="search-btn">Search</button>
+                    <button type="submit" id="search-btn" class="search-btn">Search</button>
                 </div>
 
                 <!-- Search Categories -->
@@ -784,7 +784,7 @@
     </div>
 
     <!-- Dark Mode Button -->
-    <button class="dark-mode-btn" onclick="darkMode()">Dark Mode</button>
+    <button class="dark-mode-btn" id="theme-toggle-btn" type="button">Dark Mode</button>
 
     <!-- Scripts -->
     <script>
@@ -1008,6 +1008,8 @@
 
         function renderTabs() {
             const container = document.getElementById('search-tabs');
+            if (!container) return;
+
             container.innerHTML = '';
             const tabs = loadTabs();
             const activeId = localStorage.getItem(ACTIVE_TAB_KEY) || (tabs[0] && tabs[0].id);
@@ -1026,15 +1028,23 @@
 
         function addTab(){ const tabs = loadTabs(); const newTab = createDefaultTab(tabs.length+1); tabs.push(newTab); saveTabs(tabs); saveActiveTab(newTab.id); renderTabs(); selectTab(newTab.id); }
         function closeTab(id){ let tabs = loadTabs(); const idx = tabs.findIndex(t=>t.id===id); if (idx===-1) return; const wasActive = (localStorage.getItem(ACTIVE_TAB_KEY)===id); tabs.splice(idx,1); if (tabs.length===0) tabs=[createDefaultTab(1)]; saveTabs(tabs); if (wasActive){ const next = tabs[Math.max(0, idx-1)]; saveActiveTab(next.id); renderTabs(); selectTab(next.id); } else renderTabs(); }
-        function selectTab(id){ const tabs = loadTabs(); const tab = tabs.find(t=>t.id===id); if (!tab) return; saveActiveTab(id); renderTabs(); searchInput.value = tab.query || ''; searchInput.focus(); showSuggestions(); }
         function selectTab(id){ const tabs = loadTabs(); const tab = tabs.find(t=>t.id===id); if (!tab) return; saveActiveTab(id); renderTabs(); searchInput.value = tab.query || ''; searchInput.focus(); showSuggestions(); try{ const name = 'bami-search-' + id; const w = window.open('', name); if (w) w.focus(); }catch(e){} }
         function updateActiveTabQuery(q){ const id = localStorage.getItem(ACTIVE_TAB_KEY); if (!id) return; const tabs = loadTabs(); const tab = tabs.find(t=>t.id===id); if (!tab) return; tab.query = q; const title = q.trim() || (`Tab ${tabs.indexOf(tab)+1}`); tab.title = title.length > 40 ? title.slice(0,40) + '…' : title; saveTabs(tabs); renderTabs(); }
 
         function openSearchWindow(tabId, query) {
             if (!query) return null;
-            const name = 'bami-search-' + tabId;
+            const name = tabId ? 'bami-search-' + tabId : '_blank';
             const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-            try { const win = window.open(url, name); return win; } catch(e) { return null; }
+            try {
+                const win = window.open(url, name, 'noopener,noreferrer');
+                if (win) {
+                    win.focus();
+                    return win;
+                }
+            } catch (e) {}
+
+            window.location.href = url;
+            return null;
         }
 
         function focusOrOpenSearch(tabId, query) {
@@ -1107,26 +1117,57 @@
                 div.textContent = item;
                 div.onclick = () => {
                     searchInput.value = item;
-                    searchForm.submit();
+                    performSearch(item);
                 };
                 suggestionsList.appendChild(div);
             });
             suggestionsList.style.display = 'block';
         }
 
+        function performSearch(query) {
+            const value = String(query || searchInput.value || '').trim();
+            if (!value) return false;
+
+            updateActiveTabQuery(value);
+            const url = `https://www.google.com/search?q=${encodeURIComponent(value)}`;
+            addToHistory('Search: ' + value, url);
+
+            try {
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                return true;
+            } catch (e) {
+                try {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                } catch (err) {}
+                return true;
+            }
+        }
+
         // Event Listeners
         function setupEventListeners() {
             searchInput.addEventListener('input', (e) => { showSuggestions(); updateActiveTabQuery(e.target.value); });
             searchInput.addEventListener('focus', showSuggestions);
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch(searchInput.value);
+                }
+            });
 
             searchForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const value = searchInput.value.trim();
-                if (!value) return;
-                updateActiveTabQuery(value);
-                const activeId = localStorage.getItem(ACTIVE_TAB_KEY);
-                if (activeId) openSearchWindow(activeId, value);
-                addToHistory('Search: ' + value, `https://www.google.com/search?q=${encodeURIComponent(value)}`);
+                performSearch(searchInput.value);
+            });
+
+            document.getElementById('search-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                performSearch(searchInput.value);
             });
 
             document.addEventListener('click', (e) => {
@@ -1192,15 +1233,27 @@
             loadPinnedSites();
         }
 
-        function darkMode() {
-            localStorage.setItem('theme', 'dark');
-            window.location.href = 'Darkmode.html';
+        function updateThemeButton() {
+            const btn = document.getElementById('theme-toggle-btn');
+            if (!btn) return;
+            const theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+            btn.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
         }
+
+        function toggleTheme() {
+            const nextTheme = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', nextTheme);
+            updateThemeButton();
+            window.location.replace(nextTheme === 'dark' ? 'Darkmode.html' : 'index.html');
+        }
+
+        document.getElementById('theme-toggle-btn')?.addEventListener('click', toggleTheme);
 
         if (localStorage.getItem('theme') === 'dark') {
-            window.location.href = 'Darkmode.html';
+            window.location.replace('Darkmode.html');
         }
 
+        updateThemeButton();
         init();
     </script>
 </body>

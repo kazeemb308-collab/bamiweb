@@ -833,7 +833,7 @@
     </div>
 
     <!-- Light Mode Button -->
-    <button class="light-mode-btn" onclick="lightMode()">Light Mode</button>
+    <button class="light-mode-btn" id="theme-toggle-btn" type="button">Light Mode</button>
 
     <!-- Scripts -->
     <script>
@@ -1253,7 +1253,7 @@
                 if (!value) return;
                 updateActiveTabQuery(value);
                 const activeId = localStorage.getItem(ACTIVE_TAB_KEY);
-                if (activeId) openSearchWindow(activeId, value);
+                openSearchWindow(activeId || 'search', value);
                 addToHistory('Search: ' + value, `https://www.google.com/search?q=${encodeURIComponent(value)}`);
             });
 
@@ -1320,16 +1320,28 @@
             loadPinnedSites();
         }
 
-        function lightMode() {
-            localStorage.setItem('theme', 'light');
-            try{ sessionStorage.removeItem('bami-theme'); }catch(e){}
-            window.location.href = 'index.html';
+        function updateThemeButton() {
+            const btn = document.getElementById('theme-toggle-btn');
+            if (!btn) return;
+            const theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+            btn.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
         }
+
+        function toggleTheme() {
+            const nextTheme = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', nextTheme);
+            try{ sessionStorage.removeItem('bami-theme'); }catch(e){}
+            updateThemeButton();
+            window.location.replace(nextTheme === 'dark' ? 'Darkmode.html' : 'index.html');
+        }
+
+        document.getElementById('theme-toggle-btn')?.addEventListener('click', toggleTheme);
 
         if (localStorage.getItem('theme') === 'light') {
-            window.location.href = 'index.html';
+            window.location.replace('index.html');
         }
 
+        updateThemeButton();
         init();
     </script>
 </body>
