@@ -44,7 +44,7 @@
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 2px;
             color: #ffffff;
         }
 
@@ -442,6 +442,50 @@
             color: #6bb3ff;
         }
 
+        /* Search Tabs (multi-tab search) */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin: 18px 0 12px 0;
+            justify-content: flex-start;
+            align-items: center;
+            flex-wrap: wrap;
+            overflow: auto;
+            padding-bottom: 6px;
+        }
+
+        .tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #141414;
+            color: #ddd;
+            border: 1px solid #333;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tab.active { background: #4097ee; color: #fff; border-color: #4097ee; }
+
+        .tab .close {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-left: 6px;
+            cursor: pointer;
+        }
+
+        .tab-add {
+            background: transparent;
+            border: 1px dashed #333;
+            color: #4097ee;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
         .light-mode-btn {
             position: fixed;
             bottom: 20px;
@@ -646,6 +690,18 @@
                 font-size: 14px;
             }
         }
+        .ai-guy {
+            background-color: #4097ee;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .ai-guy:hover {
+                background-color: #3077cc;
+                }
     </style>
 </head>
 <body>
@@ -657,6 +713,9 @@
         <div class="header-controls">
             <button title="Refresh" id="refresh-btn"><i class="fas fa-redo"></i></button>
             <button title="Settings" id="settings-btn"><i class="fas fa-cog"></i></button>
+            <a href="ai.html"class="ai-guy">
+                <button title="AI" id="ai-btn">AI <i class="fas fa-robot"></i></button>
+            </a>
         </div>
     </div>
 
@@ -816,12 +875,146 @@
             "how to make money online"
         ];
 
+        // Tabs: multi-tab search manager
+        const TABS_KEY = 'bami-search-tabs-dark';
+        const ACTIVE_TAB_KEY = 'bami-active-search-tab-dark';
+
+        function createDefaultTab(index) {
+            return { id: 'tab-' + Date.now() + '-' + Math.floor(Math.random()*1000), title: `Tab ${index}`, query: '' };
+        }
+
+        function loadTabs() {
+            try {
+                const raw = localStorage.getItem(TABS_KEY);
+                if (!raw) return [createDefaultTab(1)];
+                const tabs = JSON.parse(raw);
+                return Array.isArray(tabs) && tabs.length ? tabs : [createDefaultTab(1)];
+            } catch (e) { return [createDefaultTab(1)]; }
+        }
+
+        function saveTabs(tabs) { try { localStorage.setItem(TABS_KEY, JSON.stringify(tabs)); } catch(e){} }
+        function saveActiveTab(id) { try { localStorage.setItem(ACTIVE_TAB_KEY, id); } catch(e){} }
+
+        function renderTabs() {
+            const container = document.getElementById('search-tabs');
+            container.innerHTML = '';
+            const tabs = loadTabs();
+            const activeId = localStorage.getItem(ACTIVE_TAB_KEY) || (tabs[0] && tabs[0].id);
+
+            tabs.forEach((t, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'tab' + (t.id === activeId ? ' active' : '');
+                btn.dataset.id = t.id;
+                const label = document.createElement('span');
+                label.textContent = (t.title && t.title.length) ? (t.title.length > 24 ? t.title.slice(0,24) + '…' : t.title) : `Tab ${idx+1}`;
+                btn.appendChild(label);
+                const close = document.createElement('span');
+                close.className = 'close';
+                close.textContent = '×';
+                close.title = 'Close tab';
+                close.addEventListener('click', (ev) => { ev.stopPropagation(); closeTab(t.id); });
+                btn.appendChild(close);
+                btn.addEventListener('click', () => selectTab(t.id));
+                container.appendChild(btn);
+            });
+
+            const add = document.createElement('button');
+            add.className = 'tab-add';
+            add.textContent = '+ New Tab';
+            add.addEventListener('click', () => { addTab(); });
+            container.appendChild(add);
+        }
+
+        function addTab() {
+            const tabs = loadTabs();
+            const newTab = createDefaultTab(tabs.length + 1);
+            tabs.push(newTab);
+            saveTabs(tabs);
+            saveActiveTab(newTab.id);
+            renderTabs();
+            selectTab(newTab.id);
+        }
+
+        function closeTab(id) {
+            let tabs = loadTabs();
+            const idx = tabs.findIndex(t => t.id === id);
+            if (idx === -1) return;
+            const wasActive = (localStorage.getItem(ACTIVE_TAB_KEY) === id);
+            tabs.splice(idx,1);
+            if (tabs.length === 0) tabs = [createDefaultTab(1)];
+            saveTabs(tabs);
+            if (wasActive) {
+                const next = tabs[Math.max(0, idx-1)];
+                saveActiveTab(next.id);
+                renderTabs();
+                selectTab(next.id);
+            } else {
+                renderTabs();
+            }
+        }
+
+        function selectTab(id) {
+            const tabs = loadTabs();
+            const tab = tabs.find(t => t.id === id);
+            if (!tab) return;
+            saveActiveTab(id);
+            renderTabs();
+            searchInput.value = tab.query || '';
+            searchInput.focus();
+            showSuggestions();
+            // focus existing search window for this tab or open it
+            focusOrOpenSearch(id, tab.query || '');
+        }
+
+        function updateActiveTabQuery(q) {
+            const id = localStorage.getItem(ACTIVE_TAB_KEY);
+            if (!id) return;
+            const tabs = loadTabs();
+            const tab = tabs.find(t => t.id === id);
+            if (!tab) return;
+            tab.query = q;
+            // also sync title to query (shortened)
+            const title = q.trim() || (`Tab ${tabs.indexOf(tab)+1}`);
+            tab.title = title.length > 40 ? title.slice(0,40) + '…' : title;
+            saveTabs(tabs);
+            renderTabs();
+        }
+
+        function openSearchWindow(tabId, query) {
+            if (!query) return null;
+            const name = 'bami-search-' + tabId;
+            const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            try {
+                const win = window.open(url, name);
+                return win;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function focusOrOpenSearch(tabId, query) {
+            const name = 'bami-search-' + tabId;
+            try {
+                const win = window.open('', name);
+                if (win && !win.closed) {
+                    try { win.focus(); return; } catch (e) {}
+                }
+            } catch (e) {}
+            // fallback: open with query (or Google homepage if empty)
+            const url = query ? `https://www.google.com/search?q=${encodeURIComponent(query)}` : 'https://www.google.com';
+            try { window.open(url, name); } catch (e) {}
+        }
+
         // Initialize
         function init() {
             loadPinnedSites();
             loadBrowseHistory();
             updateWidgets();
             setupEventListeners();
+            renderTabs();
+            // select stored active or first
+            const active = localStorage.getItem(ACTIVE_TAB_KEY) || (loadTabs()[0] && loadTabs()[0].id);
+            if (active) selectTab(active);
             setInterval(updateWidgets, 60000);
         }
 
@@ -1051,12 +1244,16 @@
 
         // Event Listeners
         function setupEventListeners() {
-            searchInput.addEventListener('input', showSuggestions);
+            searchInput.addEventListener('input', (e) => { showSuggestions(); updateActiveTabQuery(e.target.value); });
             searchInput.addEventListener('focus', showSuggestions);
 
             searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
                 const value = searchInput.value.trim();
-                if (!value) e.preventDefault();
+                if (!value) return;
+                updateActiveTabQuery(value);
+                const activeId = localStorage.getItem(ACTIVE_TAB_KEY);
+                if (activeId) openSearchWindow(activeId, value);
                 addToHistory('Search: ' + value, `https://www.google.com/search?q=${encodeURIComponent(value)}`);
             });
 

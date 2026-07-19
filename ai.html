@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI - BAMIweb</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #111;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+        }
+        div { font-family: 'Roboto', sans-serif; font-size: 10px; text-align: center; margin-top: 20px; }
+        .ai-container {
+            width: 90%;
+            max-width: 700px;
+            margin: 30px auto;
+        }
+        #chat-box {
+            height: 400px;
+            overflow-y: auto;
+            background: #1b1b1b;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .bot,
+        .user {
+            padding: 12px;
+            border-radius: 12px;
+            margin: 12px 0;
+        }
+        .bot {
+            background: #1b1b1b;
+            color: #fff;
+        }
+        .user {
+            background: #fff;
+            color: #1b1b1b;
+        }
+        
+        .browser-header {
+            background-color: #1a1a1a;
+            border-bottom: 1px solid #333333;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .browser-logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0px;
+            color: #202124;
+        }
+
+        .browser-logo span:nth-child(1) { color: rgba(78, 156, 78, 0.726); }
+        .browser-logo span:nth-child(2) { color: rgb(180, 96, 96); }
+        .browser-logo span:nth-child(3) { color: rgb(190, 190, 107); }
+        .browser-logo span:nth-child(4) { color: rgb(100, 100, 201); }
+        .browser-logo span:nth-child(5) { color: rgb(129, 199, 129); }
+        .browser-logo span:nth-child(6) { color: rgb(187, 125, 125); }
+        .browser-logo span:nth-child(7) { color: rgb(132, 132, 211); }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-controls button {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .header-controls button:hover {
+            background-color: #333333;
+        }
+        .logo-large {
+            font-size: 72px;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 40px;
+        }
+        .logo-small {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 40px;
+            color: rgb(67, 183, 221);
+        }
+        .chat-form {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            padding: 10px;
+            background-color: black;
+            border-top: 1px solid #333333;
+            align-items: center;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .chat-form input {
+            width: 100%;
+            max-width: 520px;
+            height: 50px;
+            margin-left: 300px;
+            padding: 3px 10px;
+            border: 2px black;
+            outline: none;
+            flex: 1;
+            border-radius: 30px;
+            box-sizing: border-box;
+            background-color: rgb(39, 32, 32);
+            color: white;
+        }
+        .chat-form button {
+            position: absolute;
+            left: 780px;
+            background: rgb(39, 32, 32);
+            color: white;
+            outline: none;
+            border: 1px black;
+            flex: 1;
+            border-radius: 30px;
+            box-sizing: border-box;
+        }
+            
+    </style>
+</head>
+<body>
+    <!--Browser Header-->   
+    <div class="browser-header">
+        <div class="browser-logo">
+            <span>B</span><span>A</span><span>M</span><span>I</span><span>w</span><span>e</span><span>b</span>
+        </div>
+        <div class="header-controls">
+            <button title="Refresh" id="refresh-btn">&#128203;</button>
+            <button title="Settings" id="settings-btn">&#128203;</button>
+        </div>
+    </div>
+    <div class="logo-large">
+            <span style="color: rgba(78, 156, 78, 0.726);">B</span><span style="color: rgb(180, 96, 96);">A</span><span style="color: rgb(190, 190, 107);">M</span><span style="color: rgb(100, 100, 201);">I</span><span style="color: rgb(129, 199, 129);">w</span><span style="color: rgb(187, 125, 125);">e</span><span style="color: rgb(132, 132, 211);">b</span>
+            <div class="logo-small">AI</div>
+    </div>
+    <div class="ai-container">
+        <div id="chat-box"></div>
+        <form id="chat-form" class="chat-form">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button type="submit"><b>&#10148;</b></button>
+        </form>
+    </div>
+    <script src="ai.js"></script>
+</body>
+</html>
