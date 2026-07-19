@@ -67,15 +67,11 @@ form.addEventListener("submit", async function(e){
 
 
         // Show AI reply
-        chatBox.innerHTML += `
+        const botMessage = document.createElement("div");
+        botMessage.className = "bot";
+        botMessage.innerHTML = marked.parse(data.reply || "");
 
-            <div class="bot">
-
-                ${data.reply}
-
-            </div>
-
-        `;
+        chatBox.appendChild(botMessage);
 
 
 
@@ -85,15 +81,11 @@ form.addEventListener("submit", async function(e){
         thinking.remove();
 
 
-        chatBox.innerHTML += `
+        const botMessage = document.createElement("div");
+        botMessage.className = "bot";
+        botMessage.textContent = "Sorry, I can't connect right now ❌";
 
-            <div class="bot">
-
-                Sorry, I can't connect right now ❌
-
-            </div>
-
-        `;
+        chatBox.appendChild(botMessage);
 
 
         console.log(error);

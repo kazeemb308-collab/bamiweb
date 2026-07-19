@@ -49,14 +49,27 @@
 }
 .bot{
     align-self:flex-start;
-    max-width:80%;
+    width: fit-content;
+    max-width:min(92%, 900px);
     background: black;
     color:white;
     padding:14px 18px;
     font-size:16px;
     line-height:1.5;
     word-wrap:break-word;
-
+    text-align:left;
+    border-radius:20px 20px 20px 5px;
+}
+.bot > :first-child { margin-top: 0; }
+.bot > :last-child { margin-bottom: 0; }
+.bot pre {
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+.bot code {
+    background: rgba(255,255,255,0.12);
+    padding: 2px 4px;
+    border-radius: 4px;
 }
         .browser-header {
             background-color: #1a1a1a;
@@ -157,6 +170,7 @@
     color:white;
     font-size:17px;
     box-sizing:border-box;
+}
 .ai-input input::placeholder{
     color:#b3b3b3;
 }
@@ -220,6 +234,7 @@
             <button type="submit"><b>&#10148;</b></button>
         </form>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="ai.js"></script>
 </body>
 </html>
