@@ -678,15 +678,14 @@
                 <span style="color: rgba(78, 156, 78, 0.726);">B</span><span style="color: rgb(180, 96, 96);">A</span><span style="color: rgb(190, 190, 107);">M</span><span style="color: rgb(100, 100, 201);">I</span><span style="color: rgb(129, 199, 129);">w</span><span style="color: rgb(187, 125, 125);">e</span><span style="color: rgb(132, 132, 211);">b</span>
             </div>
 
-            <form id="search-form" class="search-form" action="https://www.google.com/search" method="get" target="_blank">
+            <form id="searchForm" class="search-form">
                 <div class="search-row">
                     <div class="search-wrapper">
-                        <input id="search-input" class="search-input" type="text" name="q" placeholder="🔍 Search anything..." autocomplete="off">
+                        <input id="searchInput" class="search-input" type="text" name="q" placeholder="🔍 Search anything..." autocomplete="off">
                         <div id="suggestions-list" class="suggestions-list"></div>
                     </div>
                     <button type="submit" id="search-btn" class="search-btn">Search</button>
-                </div>
-
+                </div></form>
                 <!-- Search Categories -->
                 <div class="search-categories" id="search-categories">
                     <button type="button" class="category-btn" data-category="all">All</button>
@@ -788,6 +787,24 @@
 
     <!-- Scripts -->
     <script>
+        const form = document.getElementById("searchForm");
+const input = document.getElementById("searchInput");
+
+form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    let text = input.value.trim();
+
+    const websitePattern = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (websitePattern.test(text)) {
+        window.location.href = "https://" + text;
+    } else {
+        window.location.href =
+            "https://www.google.com/search?q=" +
+            encodeURIComponent(text);
+    }
+});
         // Local Storage Keys
         const PINNED_KEY = 'bamiweb-pinned-sites';
         const HISTORY_KEY = 'bamiweb-browse-history';
@@ -1257,4 +1274,4 @@
         init();
     </script>
 </body>
-</html>
+</htm
