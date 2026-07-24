@@ -54,6 +54,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            position: relative;
         }
         .header-controls button {
             background: transparent;
@@ -67,6 +68,88 @@
         }
         .header-controls button:hover {
             background-color: #333333;
+        }
+        .history-toggle {
+            font-size: 20px;
+            line-height: 1;
+            padding: 6px 10px;
+        }
+        .settings-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 290px;
+            max-width: calc(100vw - 24px);
+            background: #14171d;
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+            display: none;
+            z-index: 1100;
+        }
+        .settings-panel.open {
+            display: block;
+        }
+        .settings-panel h4 {
+            margin: 0 0 10px;
+            font-size: 15px;
+        }
+        .settings-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .settings-group label {
+            font-size: 12px;
+            color: #b8c0ce;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .settings-group select,
+        .settings-group input[type="range"],
+        .settings-group input[type="text"] {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 10px;
+            background: #0f1115;
+            color: #fff;
+            padding: 8px 10px;
+            box-sizing: border-box;
+        }
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 13px;
+            color: #f2f4f8;
+        }
+        .settings-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+        .settings-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .settings-actions button {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 999px;
+            background: #2f6fed;
+            color: #fff;
+            font-size: 12px;
+        }
+        .settings-actions button.secondary {
+            background: rgba(255,255,255,0.08);
+        }
+        .upload-btn.disabled {
+            opacity: 0.45;
+            pointer-events: none;
         }
         .logo-large {
             font-size: 72px;
@@ -91,17 +174,42 @@
             gap: 18px;
             padding: 0 14px 110px;
             min-height: 0;
+            position: relative;
+        }
+        .history-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 10;
+        }
+        .history-backdrop.show {
+            opacity: 1;
+            pointer-events: auto;
         }
         .history-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
             width: 280px;
-            background: rgba(255, 255, 255, 0.05);
+            max-width: calc(100vw - 24px);
+            background: rgba(10, 12, 16, 0.98);
             border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 18px;
+            border-radius: 0 18px 18px 0;
             padding: 14px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: calc(100vh - 240px);
+            transform: translateX(-102%);
+            transition: transform 0.25s ease;
+            z-index: 20;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+        }
+        .history-panel.open {
+            transform: translateX(0);
         }
         .history-header {
             display: flex;
@@ -357,8 +465,53 @@
             <span>B</span><span>A</span><span>M</span><span>I</span><span>w</span><span>e</span><span>b</span>
         </div>
         <div class="header-controls">
-            <button title="Refresh" id="refresh-btn">&#128203;</button>
-            <button title="Settings" id="settings-btn">&#128203;</button>
+            <button title="Open chats" id="history-toggle" class="history-toggle" type="button" aria-expanded="false" aria-controls="history-panel">☰</button>
+            <button title="Refresh" id="refresh-btn" type="button">⟳</button>
+            <button title="Settings" id="settings-btn" type="button">⚙</button>
+            <div id="settings-panel" class="settings-panel" hidden>
+                <h4>Assistant settings</h4>
+                <div class="settings-group">
+                    <label>
+                        Model
+                        <select id="model-select">
+                            <option value="openrouter/free">OpenRouter Free</option>
+                            <option value="openrouter/auto">OpenRouter Auto</option>
+                            <option value="openai/gpt-4o-mini">GPT-4o mini</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="settings-group">
+                    <label>
+                        Creativity
+                        <input id="temperature-range" type="range" min="0" max="1" step="0.1">
+                        <span id="temperature-value">0.7</span>
+                    </label>
+                </div>
+                <div class="settings-group">
+                    <label>
+                        Reply style
+                        <select id="reply-style">
+                            <option value="balanced">Balanced</option>
+                            <option value="concise">Concise</option>
+                            <option value="detailed">Detailed</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-row">
+                        <span>Image upload</span>
+                        <input id="image-toggle" type="checkbox">
+                    </label>
+                    <label class="settings-row">
+                        <span>Markdown</span>
+                        <input id="markdown-toggle" type="checkbox">
+                    </label>
+                </div>
+                <div class="settings-actions">
+                    <button id="clear-history-btn" type="button">Clear history</button>
+                    <button id="reset-settings-btn" class="secondary" type="button">Reset</button>
+                </div>
+            </div>
         </div>
     </div>
     <div class="logo-large">
@@ -366,7 +519,8 @@
         <div class="logo-small">AI</div>
     </div>
     <div class="ai-container">
-        <aside class="history-panel">
+        <div id="history-backdrop" class="history-backdrop"></div>
+        <aside id="history-panel" class="history-panel">
             <div class="history-header">
                 <h3>Chats</h3>
                 <button id="new-chat-btn" type="button">New chat</button>

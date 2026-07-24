@@ -3,14 +3,37 @@ const form = document.getElementById("chat-form");
 const input = document.getElementById("user-input");
 const chatBox = document.getElementById("chat-box");
 const historyList = document.getElementById("history-list");
+const historyPanel = document.getElementById("history-panel");
+const historyBackdrop = document.getElementById("history-backdrop");
+const historyToggle = document.getElementById("history-toggle");
+const refreshBtn = document.getElementById("refresh-btn");
+const settingsBtn = document.getElementById("settings-btn");
+const settingsPanel = document.getElementById("settings-panel");
 const newChatBtn = document.getElementById("new-chat-btn");
+const clearHistoryBtn = document.getElementById("clear-history-btn");
+const resetSettingsBtn = document.getElementById("reset-settings-btn");
+const modelSelect = document.getElementById("model-select");
+const temperatureRange = document.getElementById("temperature-range");
+const temperatureValue = document.getElementById("temperature-value");
+const replyStyleSelect = document.getElementById("reply-style");
+const imageToggle = document.getElementById("image-toggle");
+const markdownToggle = document.getElementById("markdown-toggle");
 const mediaInput = document.getElementById("media-input");
 const uploadBtn = document.getElementById("upload-btn");
 const mediaPreview = document.getElementById("media-preview");
 
+const DEFAULT_SETTINGS = {
+    model: "openrouter/free",
+    temperature: 0.7,
+    replyStyle: "balanced",
+    imageEnabled: true,
+    markdownEnabled: true
+};
+
 let conversations = loadConversations();
 let activeConversationId = null;
 let pendingImageData = null;
+let settings = loadSettings();
 
 function loadConversations() {
     try {
@@ -24,6 +47,36 @@ function loadConversations() {
 
 function saveConversations() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+}
+
+function loadSettings() {
+    try {
+        const stored = localStorage.getItem("bami-ai-settings-v1");
+        return stored ? { ...DEFAULT_SETTINGS, ...JSON.parse(stored) } : { ...DEFAULT_SETTINGS };
+    } catch (error) {
+        console.warn("Could not load settings", error);
+        return { ...DEFAULT_SETTINGS };
+    }
+}
+
+function saveSettings() {
+    localStorage.setItem("bami-ai-settings-v1", JSON.stringify(settings));
+}
+
+function applySettingsUI() {
+    if (modelSelect) modelSelect.value = settings.model || DEFAULT_SETTINGS.model;
+    if (temperatureRange) temperatureRange.value = settings.temperature ?? DEFAULT_SETTINGS.temperature;
+    if (temperatureValue) temperatureValue.textContent = Number(settings.temperature ?? DEFAULT_SETTINGS.temperature).toFixed(1);
+    if (replyStyleSelect) replyStyleSelect.value = settings.replyStyle || DEFAULT_SETTINGS.replyStyle;
+    if (imageToggle) imageToggle.checked = settings.imageEnabled !== false;
+    if (markdownToggle) markdownToggle.checked = settings.markdownEnabled !== false;
+    if (uploadBtn) {
+        uploadBtn.disabled = settings.imageEnabled === false;
+        uploadBtn.classList.toggle("disabled", settings.imageEnabled === false);
+    }
+    if (settings.imageEnabled === false) {
+        clearAttachment();
+    }
 }
 
 function escapeHtml(value) {
@@ -106,6 +159,7 @@ function renderHistory() {
             activeConversationId = conversation.id;
             renderHistory();
             renderMessages();
+            closeHistory();
         });
 
         item.querySelector(".pin-btn").addEventListener("click", (event) => {
@@ -148,7 +202,11 @@ function renderMessages() {
                 bubble.appendChild(imageWrap);
             }
         } else {
-            bubble.innerHTML = marked.parse(message.content || "");
+            if (settings.markdownEnabled !== false) {
+                bubble.innerHTML = marked.parse(message.content || "");
+            } else {
+                bubble.textContent = message.content || "";
+            }
         }
 
         chatBox.appendChild(bubble);
@@ -180,6 +238,38 @@ function appendThinking() {
     chatBox.appendChild(thinking);
     chatBox.scrollTop = chatBox.scrollHeight;
     return thinking;
+}
+
+function openHistory() {
+    historyPanel.classList.add("open");
+    historyBackdrop.classList.add("show");
+    historyToggle.setAttribute("aria-expanded", "true");
+}
+
+function closeHistory() {
+    historyPanel.classList.remove("open");
+    historyBackdrop.classList.remove("show");
+    historyToggle.setAttribute("aria-expanded", "false");
+}
+
+function openSettings() {
+    settingsPanel.hidden = false;
+    settingsPanel.classList.add("open");
+    settingsBtn.setAttribute("aria-expanded", "true");
+}
+
+function closeSettings() {
+    settingsPanel.classList.remove("open");
+    settingsPanel.hidden = true;
+    settingsBtn.setAttribute("aria-expanded", "false");
+}
+
+function toggleSettings() {
+    if (settingsPanel.classList.contains("open")) {
+        closeSettings();
+    } else {
+        openSettings();
+    }
 }
 
 form.addEventListener("submit", async function (e) {
@@ -215,6 +305,10 @@ form.addEventListener("submit", async function (e) {
             body: JSON.stringify({
                 message: userText,
                 imageDataUrl: pendingImageData,
+                imageEnabled: settings.imageEnabled !== false,
+                model: settings.model || DEFAULT_SETTINGS.model,
+                temperature: Number(settings.temperature ?? DEFAULT_SETTINGS.temperature),
+                responseStyle: settings.replyStyle || DEFAULT_SETTINGS.replyStyle,
                 conversationHistory: conversation.messages.slice(-8)
             })
         });
@@ -247,10 +341,77 @@ form.addEventListener("submit", async function (e) {
 
 newChatBtn.addEventListener("click", () => {
     createConversation();
+    closeHistory();
     input.focus();
 });
 
-uploadBtn.addEventListener("click", () => mediaInput.click());
+clearHistoryBtn.addEventListener("click", () => {
+    if (confirm("Clear all chats?")) {
+        conversations = [];
+        activeConversationId = null;
+        saveConversations();
+        createConversation();
+        closeHistory();
+    }
+});
+
+resetSettingsBtn.addEventListener("click", () => {
+    settings = { ...DEFAULT_SETTINGS };
+    saveSettings();
+    applySettingsUI();
+});
+
+modelSelect.addEventListener("change", (event) => {
+    settings.model = event.target.value;
+    saveSettings();
+});
+
+temperatureRange.addEventListener("input", (event) => {
+    settings.temperature = Number(event.target.value);
+    temperatureValue.textContent = Number(settings.temperature).toFixed(1);
+    saveSettings();
+});
+
+replyStyleSelect.addEventListener("change", (event) => {
+    settings.replyStyle = event.target.value;
+    saveSettings();
+});
+
+imageToggle.addEventListener("change", (event) => {
+    settings.imageEnabled = event.target.checked;
+    saveSettings();
+    applySettingsUI();
+});
+
+markdownToggle.addEventListener("change", (event) => {
+    settings.markdownEnabled = event.target.checked;
+    saveSettings();
+    renderMessages();
+});
+
+refreshBtn.addEventListener("click", () => {
+    window.location.reload();
+});
+
+settingsBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleSettings();
+});
+
+document.addEventListener("click", (event) => {
+    if (!settingsPanel.contains(event.target) && !settingsBtn.contains(event.target)) {
+        closeSettings();
+    }
+});
+
+historyToggle.addEventListener("click", toggleHistory);
+historyBackdrop.addEventListener("click", closeHistory);
+
+uploadBtn.addEventListener("click", () => {
+    if (settings.imageEnabled !== false) {
+        mediaInput.click();
+    }
+});
 
 mediaInput.addEventListener("change", () => {
     const file = mediaInput.files && mediaInput.files[0];
@@ -262,6 +423,8 @@ mediaInput.addEventListener("change", () => {
     };
     reader.readAsDataURL(file);
 });
+
+applySettingsUI();
 
 if (!conversations.length) {
     createConversation();

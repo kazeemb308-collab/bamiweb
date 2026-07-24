@@ -5,13 +5,27 @@ export default async function handler(req, res) {
         });
     }
 
-    const { message, imageDataUrl, conversationHistory = [] } = req.body;
+    const {
+        message,
+        imageDataUrl,
+        imageEnabled = true,
+        model = "openrouter/free",
+        temperature = 0.7,
+        responseStyle = "balanced",
+        conversationHistory = []
+    } = req.body;
 
     if (!process.env.OPENROUTER_API_KEY) {
         return res.status(200).json({
             reply: "The AI service is not configured yet. Add an OpenRouter key to enable responses."
         });
     }
+
+    const styleInstruction = responseStyle === "concise"
+        ? "Reply concisely and directly."
+        : responseStyle === "detailed"
+            ? "Reply in a detailed and helpful manner."
+            : "Reply in a balanced and practical manner.";
 
     const historyMessages = (conversationHistory || []).slice(-8).map((entry) => {
         if (entry.image) {
@@ -29,7 +43,9 @@ export default async function handler(req, res) {
         };
     });
 
-    const currentMessage = imageDataUrl
+    const useImage = Boolean(imageDataUrl) && imageEnabled !== false;
+
+    const currentMessage = useImage
         ? {
             role: "user",
             content: [
@@ -51,11 +67,12 @@ export default async function handler(req, res) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "openrouter/free",
+                model: model || "openrouter/free",
+                temperature: Number(temperature ?? 0.7),
                 messages: [
                     {
                         role: "system",
-                        content: "You are BAMI AI, a helpful assistant inside BAMIweb. Keep replies concise and practical."
+                        content: `You are BAMI AI, a helpful assistant inside BAMIweb. ${styleInstruction}`
                     },
                     ...historyMessages,
                     currentMessage
