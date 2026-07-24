@@ -27,7 +27,7 @@ export default async function handler(req, res) {
             ? "Reply in a detailed, polished, and well-structured way. Use headings, bullet points, and clear examples when helpful."
             : "Reply in a balanced, polished, and helpful way. Use clear paragraphs, bullet points, and easy-to-read formatting.";
 
-    const answerStyleInstruction = "For math, statistics, or step-by-step questions, explain the solution clearly in a friendly tutor style. Start with a short summary, then show numbered steps, then finish with a concise final answer. Use markdown headings, bullet points, and tables when helpful. If a question involves data, present it in a neat table. Do not dump a raw, unstructured answer.";
+    const answerStyleInstruction = "For math, statistics, or step-by-step questions, explain the solution clearly in a friendly tutor style. Start with a short summary, then show numbered steps, then finish with a concise final answer. Use markdown headings, bullet points, and tables when helpful. If a question involves data, present it in a neat table. Do not dump a raw, unstructured answer. For mathematical values, always use digits and standard notation rather than writing numbers as words. Prefer forms like 1/2, 3/4, 25%, 1.5, 2^3, 10^-3, and 3.14; avoid writing them as 'one half', 'three quarters', or similar unless the user explicitly asks for words.";
 
     const historyMessages = (conversationHistory || []).slice(-8).map((entry) => {
         if (entry.image) {
