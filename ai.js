@@ -89,20 +89,29 @@ function escapeHtml(value) {
 }
 
 function normalizeLatexNotation(text) {
-    let value = String(text || "").trim();
+    if (!text) return "";
 
-    value = value.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "($1)/($2)");
-    value = value.replace(/\\dfrac\{([^{}]+)\}\{([^{}]+)\}/g, "($1)/($2)");
-    value = value.replace(/\\left|\\right/g, "");
-    value = value.replace(/\\cdot/g, " × ");
-    value = value.replace(/\\times/g, " × ");
-    value = value.replace(/\\sqrt\{([^{}]+)\}/g, "sqrt($1)");
-    value = value.replace(/\\text\{([^{}]+)\}/g, "$1");
-    value = value.replace(/\\([A-Za-z]+)/g, "");
-    value = value.replace(/\{([^{}]+)\}/g, "$1");
-    value = value.replace(/\s+/g, " ").trim();
+    return String(text)
+        .split("\n")
+        .map((line) => {
+            const trimmed = line.trim();
+            if (!trimmed) return line;
+            if (/^\s*\|.*\|/.test(trimmed)) return line;
+            if (/^```/.test(trimmed)) return line;
 
-    return value;
+            let normalized = line;
+            normalized = normalized.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "($1)/($2)");
+            normalized = normalized.replace(/\\dfrac\{([^{}]+)\}\{([^{}]+)\}/g, "($1)/($2)");
+            normalized = normalized.replace(/\\left|\\right/g, "");
+            normalized = normalized.replace(/\\cdot/g, " × ");
+            normalized = normalized.replace(/\\times/g, " × ");
+            normalized = normalized.replace(/\\sqrt\{([^{}]+)\}/g, "sqrt($1)");
+            normalized = normalized.replace(/\\text\{([^{}]+)\}/g, "$1");
+            normalized = normalized.replace(/\\([A-Za-z]+)/g, "");
+            normalized = normalized.replace(/\s+/g, " ").trim();
+            return normalized;
+        })
+        .join("\n");
 }
 
 function formatReplyContent(content) {
@@ -113,7 +122,6 @@ function formatReplyContent(content) {
     text = text.replace(/(^|\n)(\d+)\.\s+/gm, "$1$2. ");
     text = text.replace(/\n{3,}/g, "\n\n");
     text = text.replace(/\n(?=\d+\.)/g, "\n");
-    text = text.replace(/\|/g, " | ");
 
     return text;
 }
