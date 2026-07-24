@@ -734,8 +734,9 @@
                         <div id="suggestions-list" class="suggestions-list"></div>
                     </div>
                     <button type="submit" id="search-btn" class="search-btn">Search</button>
-                </div></form>
-
+                </div>
+            </form>
+            <br>
                 <!-- Search Categories -->
                 <div class="search-categories" id="search-categories">
                     <button type="button" class="category-btn" data-category="all">All</button>
@@ -837,24 +838,6 @@
 
     <!-- Scripts -->
     <script>
-        const form = document.getElementById("searchForm");
-const input = document.getElementById("searchInput");
-
-form.addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    let text = input.value.trim();
-
-    const websitePattern = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    if (websitePattern.test(text)) {
-        window.location.href = "https://" + text;
-    } else {
-        window.location.href =
-            "https://www.google.com/search?q=" +
-            encodeURIComponent(text);
-    }
-});
         // Local Storage Keys
         const PINNED_KEY = 'bamiweb-pinned-sites';
         const HISTORY_KEY = 'bamiweb-browse-history';
@@ -998,10 +981,25 @@ form.addEventListener("submit", function (e) {
             renderTabs();
         }
 
+        function buildUrl(query) {
+            const trimmed = String(query).trim();
+            if (!trimmed) return '';
+            if (/^(https?:\/\/)/i.test(trimmed)) return trimmed;
+            if (/^www\./i.test(trimmed)) return 'https://' + trimmed;
+            if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/i.test(trimmed)) return 'https://' + trimmed;
+            return '';
+        }
+
+        function isLink(query) {
+            return Boolean(buildUrl(query));
+        }
+
         function openSearchWindow(tabId, query) {
             if (!query) return null;
             const name = 'bami-search-' + tabId;
-            const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            const url = buildUrl(query)
+                ? buildUrl(query)
+                : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
             try {
                 const win = window.open(url, name);
                 return win;
@@ -1018,9 +1016,39 @@ form.addEventListener("submit", function (e) {
                     try { win.focus(); return; } catch (e) {}
                 }
             } catch (e) {}
-            // fallback: open with query (or Google homepage if empty)
-            const url = query ? `https://www.google.com/search?q=${encodeURIComponent(query)}` : 'https://www.google.com';
+            const url = query
+                ? isLink(query)
+                    ? `browser.html?q=${encodeURIComponent(query)}`
+                    : `https://www.google.com/search?q=${encodeURIComponent(query)}`
+                : 'https://www.google.com';
             try { window.open(url, name); } catch (e) {}
+        }
+
+        function performSearch(query) {
+            const value = String(query || searchInput.value || '').trim();
+            if (!value) return false;
+
+            updateActiveTabQuery(value);
+            const url = buildUrl(value)
+                ? buildUrl(value)
+                : `https://www.google.com/search?q=${encodeURIComponent(value)}`;
+            addToHistory('Search: ' + value, url);
+
+            try {
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                return true;
+            } catch (e) {
+                try {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                } catch (err) {}
+                return true;
+            }
         }
 
         // Initialize
@@ -1189,8 +1217,8 @@ form.addEventListener("submit", function (e) {
         }
 
         // Search Functionality
-        const searchForm = document.getElementById('search-form');
-        const searchInput = document.getElementById('search-input');
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
         const suggestionsList = document.getElementById('suggestions-list');
         let activeRequestId = 0;
         let pendingScript = null;
@@ -1253,7 +1281,7 @@ form.addEventListener("submit", function (e) {
                 div.textContent = item;
                 div.onclick = () => {
                     searchInput.value = item;
-                    searchForm.submit();
+                    performSearch(item);
                 };
                 suggestionsList.appendChild(div);
             });
@@ -1264,15 +1292,21 @@ form.addEventListener("submit", function (e) {
         function setupEventListeners() {
             searchInput.addEventListener('input', (e) => { showSuggestions(); updateActiveTabQuery(e.target.value); });
             searchInput.addEventListener('focus', showSuggestions);
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch(searchInput.value);
+                }
+            });
 
             searchForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const value = searchInput.value.trim();
-                if (!value) return;
-                updateActiveTabQuery(value);
-                const activeId = localStorage.getItem(ACTIVE_TAB_KEY);
-                openSearchWindow(activeId || 'search', value);
-                addToHistory('Search: ' + value, `https://www.google.com/search?q=${encodeURIComponent(value)}`);
+                performSearch(searchInput.value);
+            });
+
+            document.getElementById('search-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                performSearch(searchInput.value);
             });
 
             document.addEventListener('click', (e) => {

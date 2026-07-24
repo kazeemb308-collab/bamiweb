@@ -686,6 +686,7 @@
                     </div>
                     <button type="submit" id="search-btn" class="search-btn">Search</button>
                 </div></form>
+                <br>
                 <!-- Search Categories -->
                 <div class="search-categories" id="search-categories">
                     <button type="button" class="category-btn" data-category="all">All</button>
@@ -788,23 +789,26 @@
     <!-- Scripts -->
     <script>
         const form = document.getElementById("searchForm");
-const input = document.getElementById("searchInput");
+        const input = document.getElementById("searchInput");
 
-form.addEventListener("submit", function (e) {
-    e.preventDefault();
+        function buildUrl(query) {
+            const trimmed = String(query).trim();
+            if (!trimmed) return '';
+            if (/^(https?:\/\/)/i.test(trimmed)) return trimmed;
+            if (/^www\./i.test(trimmed)) return 'https://' + trimmed;
+            if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/i.test(trimmed)) return 'https://' + trimmed;
+            return '';
+        }
 
-    let text = input.value.trim();
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
 
-    const websitePattern = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            let text = input.value.trim();
+            if (!text) return;
 
-    if (websitePattern.test(text)) {
-        window.location.href = "https://" + text;
-    } else {
-        window.location.href =
-            "https://www.google.com/search?q=" +
-            encodeURIComponent(text);
-    }
-});
+            const url = buildUrl(text) || `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+            window.location.href = url;
+        });
         // Local Storage Keys
         const PINNED_KEY = 'bamiweb-pinned-sites';
         const HISTORY_KEY = 'bamiweb-browse-history';
@@ -1008,8 +1012,8 @@ form.addEventListener("submit", function (e) {
         }
 
         // Search Functionality
-        const searchForm = document.getElementById('search-form');
-        const searchInput = document.getElementById('search-input');
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
         const suggestionsList = document.getElementById('suggestions-list');
         let activeRequestId = 0;
         let pendingScript = null;
@@ -1048,10 +1052,25 @@ form.addEventListener("submit", function (e) {
         function selectTab(id){ const tabs = loadTabs(); const tab = tabs.find(t=>t.id===id); if (!tab) return; saveActiveTab(id); renderTabs(); searchInput.value = tab.query || ''; searchInput.focus(); showSuggestions(); try{ const name = 'bami-search-' + id; const w = window.open('', name); if (w) w.focus(); }catch(e){} }
         function updateActiveTabQuery(q){ const id = localStorage.getItem(ACTIVE_TAB_KEY); if (!id) return; const tabs = loadTabs(); const tab = tabs.find(t=>t.id===id); if (!tab) return; tab.query = q; const title = q.trim() || (`Tab ${tabs.indexOf(tab)+1}`); tab.title = title.length > 40 ? title.slice(0,40) + '…' : title; saveTabs(tabs); renderTabs(); }
 
+        function buildUrl(query) {
+            const trimmed = String(query).trim();
+            if (!trimmed) return '';
+            if (/^(https?:\/\/)/i.test(trimmed)) return trimmed;
+            if (/^www\./i.test(trimmed)) return 'https://' + trimmed;
+            if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/i.test(trimmed)) return 'https://' + trimmed;
+            return '';
+        }
+
+        function isLink(query) {
+            return Boolean(buildUrl(query));
+        }
+
         function openSearchWindow(tabId, query) {
             if (!query) return null;
             const name = tabId ? 'bami-search-' + tabId : '_blank';
-            const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            const url = buildUrl(query)
+                ? buildUrl(query)
+                : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
             try {
                 const win = window.open(url, name, 'noopener,noreferrer');
                 if (win) {
@@ -1072,7 +1091,11 @@ form.addEventListener("submit", function (e) {
                     try { win.focus(); return; } catch (e) {}
                 }
             } catch (e) {}
-            const url = query ? `https://www.google.com/search?q=${encodeURIComponent(query)}` : 'https://www.google.com';
+            const url = query
+                ? buildUrl(query)
+                    ? buildUrl(query)
+                    : `https://www.google.com/search?q=${encodeURIComponent(query)}`
+                : 'https://www.google.com';
             try { window.open(url, name); } catch (e) {}
         }
 
@@ -1146,7 +1169,9 @@ form.addEventListener("submit", function (e) {
             if (!value) return false;
 
             updateActiveTabQuery(value);
-            const url = `https://www.google.com/search?q=${encodeURIComponent(value)}`;
+            const url = buildUrl(value)
+                ? buildUrl(value)
+                : `https://www.google.com/search?q=${encodeURIComponent(value)}`;
             addToHistory('Search: ' + value, url);
 
             try {
