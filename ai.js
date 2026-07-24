@@ -88,6 +88,18 @@ function escapeHtml(value) {
         .replace(/'/g, "&#39;");
 }
 
+function formatReplyContent(content) {
+    let text = String(content || "").trim().replace(/\r/g, "");
+
+    text = text.replace(/(^|\n)(Step\s+\d+|Answer|Final Answer|Solution|Explanation|Result)\s*:/gim, "$1**$2:**");
+    text = text.replace(/(^|\n)(\d+)\.\s+/gm, "$1$2. ");
+    text = text.replace(/\n{3,}/g, "\n\n");
+    text = text.replace(/\n(?=\d+\.)/g, "\n");
+    text = text.replace(/\|/g, " | ");
+
+    return text;
+}
+
 function createConversation() {
     const conversation = {
         id: window.crypto && crypto.randomUUID ? crypto.randomUUID() : `chat-${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -204,9 +216,7 @@ function renderMessages() {
         } else {
             const content = message.content || "";
             if (settings.markdownEnabled !== false) {
-                const cleaned = String(content)
-                    .replace(/\n{3,}/g, "\n\n")
-                    .trim();
+                const cleaned = formatReplyContent(content);
                 bubble.innerHTML = marked.parse(cleaned);
             } else {
                 bubble.textContent = content;

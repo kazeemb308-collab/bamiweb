@@ -27,6 +27,8 @@ export default async function handler(req, res) {
             ? "Reply in a detailed, polished, and well-structured way. Use headings, bullet points, and clear examples when helpful."
             : "Reply in a balanced, polished, and helpful way. Use clear paragraphs, bullet points, and easy-to-read formatting.";
 
+    const answerStyleInstruction = "For math, statistics, or step-by-step questions, explain the solution clearly in a friendly tutor style. Start with a short summary, then show numbered steps, then finish with a concise final answer. Use markdown headings, bullet points, and tables when helpful. If a question involves data, present it in a neat table. Do not dump a raw, unstructured answer.";
+
     const historyMessages = (conversationHistory || []).slice(-8).map((entry) => {
         if (entry.image) {
             return {
@@ -72,7 +74,7 @@ export default async function handler(req, res) {
                 messages: [
                     {
                         role: "system",
-                        content: `You are BAMI AI, a polished assistant inside BAMIweb. ${styleInstruction} Format the answer like a modern AI assistant: clear, structured, and easy to read. Avoid raw dumps of data unless the user asks for them.`
+                        content: `You are BAMI AI, a polished assistant inside BAMIweb. ${styleInstruction} ${answerStyleInstruction} Format the answer like a modern AI assistant: clear, structured, and easy to read. Avoid raw dumps of data unless the user asks for them.`
                     },
                     ...historyMessages,
                     currentMessage
