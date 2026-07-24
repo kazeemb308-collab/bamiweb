@@ -110,6 +110,8 @@ function normalizeLatexNotation(text) {
             normalized = normalized.replace(/\\text\s*\{([^{}]+)\}/g, "$1");
             normalized = normalized.replace(/\\([A-Za-z]+)/g, "");
             normalized = normalized.replace(/\{([^{}]+)\}/g, "$1");
+            normalized = normalized.replace(/\[\s*([^\]]+)\s*\]/g, "$1");
+            normalized = normalized.replace(/\(\s*\)/g, "()");
             normalized = normalized.replace(/\s+/g, " ").trim();
             return normalized;
         })
