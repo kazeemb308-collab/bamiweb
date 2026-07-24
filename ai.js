@@ -101,18 +101,24 @@ function normalizeLatexNotation(text) {
             if (/^```/.test(trimmed)) return line;
 
             let normalized = line;
+            // Preserve spacing around mathematical operators
+            normalized = normalized.replace(/\\\(/g, "");
+            normalized = normalized.replace(/\\\)/g, "");
+            normalized = normalized.replace(/\\\[/g, "");
+            normalized = normalized.replace(/\\\]/g, "");
+            // Better fraction handling with spacing
             normalized = normalized.replace(/\\frac\s*\{?([^{}]+)\}?\s*\{?([^{}]+)\}?/g, "($1)/($2)");
             normalized = normalized.replace(/\\dfrac\s*\{?([^{}]+)\}?\s*\{?([^{}]+)\}?/g, "($1)/($2)");
             normalized = normalized.replace(/\\left|\\right/g, "");
-            normalized = normalized.replace(/\\cdot/g, " × ");
+            normalized = normalized.replace(/\\cdot/g, " · ");
             normalized = normalized.replace(/\\times/g, " × ");
-            normalized = normalized.replace(/\\sqrt\s*\{([^{}]+)\}/g, "sqrt($1)");
+            normalized = normalized.replace(/\\sqrt\s*\{([^{}]+)\}/g, "√($1)");
             normalized = normalized.replace(/\\text\s*\{([^{}]+)\}/g, "$1");
-            normalized = normalized.replace(/\\([A-Za-z]+)/g, "");
+            // Preserve some basic formatting
             normalized = normalized.replace(/\{([^{}]+)\}/g, "$1");
             normalized = normalized.replace(/\[\s*([^\]]+)\s*\]/g, "$1");
-            normalized = normalized.replace(/\(\s*\)/g, "()");
-            normalized = normalized.replace(/\s+/g, " ").trim();
+            // Single whitespace normalization only at ends
+            normalized = normalized.replace(/^\s+|\s+$/g, "").replace(/\s{2,}/g, " ");
             return normalized;
         })
         .join("\n");
@@ -122,10 +128,14 @@ function formatReplyContent(content) {
     let text = String(content || "").trim().replace(/\r/g, "");
 
     text = normalizeLatexNotation(text);
-    text = text.replace(/(^|\n)(Step\s+\d+|Answer|Final Answer|Solution|Explanation|Result)\s*:/gim, "$1**$2:**");
+    // Better formatting for section headers with proper spacing
+    text = text.replace(/(^|\n)(Step\s+\d+|Answer|Final Answer|Solution|Explanation|Result|Calculation|Work|Given|Formula)\s*:/gim, "$1\n**$2:**");
     text = text.replace(/(^|\n)(\d+)\.\s+/gm, "$1$2. ");
+    // Reduce excessive line breaks but preserve paragraph structure
     text = text.replace(/\n{3,}/g, "\n\n");
     text = text.replace(/\n(?=\d+\.)/g, "\n");
+    // Ensure proper spacing around mathematical content
+    text = text.replace(/([=+\-×÷\(\)])\s*\n/g, "$1 ");
 
     return text;
 }
@@ -153,6 +163,7 @@ function createConversation() {
     saveConversations();
     renderHistory();
     renderMessages();
+    clearAttachment();
     return conversation;
 }
 
@@ -230,11 +241,12 @@ function renderMessages() {
     const conversation = ensureActiveConversation();
     chatBox.innerHTML = "";
 
-    if (!conversation.messages.length) {
+    if (!conversation || !conversation.messages || !conversation.messages.length) {
         const empty = document.createElement("div");
         empty.className = "empty-state";
         empty.innerHTML = "<h3>Start a new chat</h3><p>Send a message or share an image and it will appear here.</p>";
         chatBox.appendChild(empty);
+        chatBox.scrollTop = 0;
         return;
     }
 
@@ -417,109 +429,146 @@ form.addEventListener("submit", async function (e) {
     clearAttachment();
 });
 
-newChatBtn.addEventListener("click", () => {
-    createConversation();
-    closeHistory();
-    input.focus();
-});
-
-clearHistoryBtn.addEventListener("click", () => {
-    if (confirm("Clear all chats?")) {
-        conversations = [];
-        activeConversationId = null;
-        saveConversations();
+// Event listeners setup with defensive checks
+if (newChatBtn) {
+    newChatBtn.addEventListener("click", () => {
         createConversation();
         closeHistory();
-    }
-});
+        input.focus();
+        // Ensure chat box is scrolled to top to show empty state
+        if (chatBox) {
+            chatBox.scrollTop = 0;
+        }
+    });
+}
 
-resetSettingsBtn.addEventListener("click", () => {
-    settings = { ...DEFAULT_SETTINGS };
-    saveSettings();
-    applySettingsUI();
-});
+if (clearHistoryBtn) {
+    clearHistoryBtn.addEventListener("click", () => {
+        if (confirm("Clear all chats?")) {
+            conversations = [];
+            activeConversationId = null;
+            saveConversations();
+            createConversation();
+            closeHistory();
+        }
+    });
+}
 
-modelSelect.addEventListener("change", (event) => {
-    settings.model = event.target.value;
-    saveSettings();
-});
+if (resetSettingsBtn) {
+    resetSettingsBtn.addEventListener("click", () => {
+        settings = { ...DEFAULT_SETTINGS };
+        saveSettings();
+        applySettingsUI();
+    });
+}
 
-temperatureRange.addEventListener("input", (event) => {
-    settings.temperature = Number(event.target.value);
-    temperatureValue.textContent = Number(settings.temperature).toFixed(1);
-    saveSettings();
-});
+if (modelSelect) {
+    modelSelect.addEventListener("change", (event) => {
+        settings.model = event.target.value;
+        saveSettings();
+    });
+}
 
-replyStyleSelect.addEventListener("change", (event) => {
-    settings.replyStyle = event.target.value;
-    saveSettings();
-});
+if (temperatureRange) {
+    temperatureRange.addEventListener("input", (event) => {
+        settings.temperature = Number(event.target.value);
+        if (temperatureValue) temperatureValue.textContent = Number(settings.temperature).toFixed(1);
+        saveSettings();
+    });
+}
 
-imageToggle.addEventListener("change", (event) => {
-    settings.imageEnabled = event.target.checked;
-    saveSettings();
-    applySettingsUI();
-});
+if (replyStyleSelect) {
+    replyStyleSelect.addEventListener("change", (event) => {
+        settings.replyStyle = event.target.value;
+        saveSettings();
+    });
+}
 
-markdownToggle.addEventListener("change", (event) => {
-    settings.markdownEnabled = event.target.checked;
-    saveSettings();
-    renderMessages();
-});
+if (imageToggle) {
+    imageToggle.addEventListener("change", (event) => {
+        settings.imageEnabled = event.target.checked;
+        saveSettings();
+        applySettingsUI();
+    });
+}
 
-refreshBtn.addEventListener("click", () => {
-    window.location.reload();
-});
+if (markdownToggle) {
+    markdownToggle.addEventListener("change", (event) => {
+        settings.markdownEnabled = event.target.checked;
+        saveSettings();
+        renderMessages();
+    });
+}
 
-settingsBtn.addEventListener("click", (event) => {
-    event.stopPropagation();
-    toggleSettings();
-});
+// Main control buttons - ensure these work
+if (refreshBtn) {
+    refreshBtn.addEventListener("click", () => {
+        window.location.reload();
+    });
+}
 
-document.addEventListener("click", (event) => {
-    if (!settingsPanel.contains(event.target) && !settingsBtn.contains(event.target)) {
-        closeSettings();
-    }
-});
+if (settingsBtn) {
+    settingsBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        toggleSettings();
+    });
+}
 
-historyToggle.addEventListener("click", toggleHistory);
-historyBackdrop.addEventListener("click", closeHistory);
+if (settingsPanel) {
+    document.addEventListener("click", (event) => {
+        if (!settingsPanel.contains(event.target) && !settingsBtn.contains(event.target)) {
+            closeSettings();
+        }
+    });
+}
 
-uploadBtn.addEventListener("click", () => {
-    if (settings.imageEnabled !== false) {
-        mediaInput.click();
-    }
-});
+if (historyToggle) {
+    historyToggle.addEventListener("click", toggleHistory);
+}
 
-mediaInput.addEventListener("change", () => {
-    const file = mediaInput.files && mediaInput.files[0];
-    if (!file) return;
+if (historyBackdrop) {
+    historyBackdrop.addEventListener("click", closeHistory);
+}
 
-    if (file.type.startsWith("image/")) {
+if (uploadBtn) {
+    uploadBtn.addEventListener("click", () => {
+        if (settings.imageEnabled !== false) {
+            mediaInput.click();
+        }
+    });
+}
+
+if (mediaInput) {
+    mediaInput.addEventListener("change", () => {
+        const file = mediaInput.files && mediaInput.files[0];
+        if (!file) return;
+
+        if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                showAttachmentPreview(file, reader.result, "");
+            };
+            reader.readAsDataURL(file);
+            return;
+        }
+
+        const isTextLike = file.type.startsWith("text/") || ["application/json", "application/xml", "application/javascript", "application/x-javascript", "application/pdf"].includes(file.type);
+        if (isTextLike) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                showAttachmentPreview(file, null, reader.result);
+            };
+            reader.readAsText(file);
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = function () {
             showAttachmentPreview(file, reader.result, "");
         };
         reader.readAsDataURL(file);
-        return;
-    }
-
-    const isTextLike = file.type.startsWith("text/") || ["application/json", "application/xml", "application/javascript", "application/x-javascript", "application/pdf"].includes(file.type);
-    if (isTextLike) {
-        const reader = new FileReader();
-        reader.onload = function () {
-            showAttachmentPreview(file, null, reader.result);
-        };
-        reader.readAsText(file);
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function () {
-        showAttachmentPreview(file, reader.result, "");
-    };
-    reader.readAsDataURL(file);
-});
+    });
+}
 
 applySettingsUI();
 
