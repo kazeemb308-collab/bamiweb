@@ -118,12 +118,77 @@ function formatReplyContent(content) {
     let text = String(content || "").trim().replace(/\r/g, "");
 
     text = normalizeLatexNotation(text);
+    text = text.replace(/\[\s*([^\]]+)\s*\]/g, "$1");
+    text = text.replace(/\*\*\*([^*]+)\*\*\*/g, "$1");
+    text = text.replace(/\*\*([^*]+)\*\*/g, "$1");
+    text = text.replace(/\*([^*]+)\*/g, "$1");
     text = text.replace(/(^|\n)(Step\s+\d+|Answer|Final Answer|Solution|Explanation|Result)\s*:/gim, "$1**$2:**");
     text = text.replace(/(^|\n)(\d+)\.\s+/gm, "$1$2. ");
     text = text.replace(/\n{3,}/g, "\n\n");
     text = text.replace(/\n(?=\d+\.)/g, "\n");
+    text = text.replace(/\s+\|/g, " |");
+    text = text.replace(/\|\s+/g, "| ");
 
     return text;
+}
+
+function isTableRow(line) {
+    return /^\s*\|.*\|/.test(line.trim());
+}
+
+function isSeparatorRow(line) {
+    return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line.trim());
+}
+
+function renderTable(rows) {
+    const header = rows[0].trim().split("|").slice(1, -1).map((cell) => cell.trim());
+    const bodyRows = rows.slice(2).filter(Boolean).map((row) => row.trim().split("|").slice(1, -1).map((cell) => cell.trim()));
+    const headerHtml = header.map((cell) => `<th>${escapeHtml(cell)}</th>`).join("");
+    const bodyHtml = bodyRows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("");
+
+    return `<table><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table>`;
+}
+
+function convertMarkdownTables(text) {
+    const lines = String(text || "").replace(/\r/g, "").split("\n");
+    const output = [];
+    let index = 0;
+
+    while (index < lines.length) {
+        const line = lines[index];
+        const nextLine = lines[index + 1] || "";
+
+        if (isTableRow(line) && isSeparatorRow(nextLine)) {
+            const rows = [line, nextLine];
+            index += 2;
+            while (index < lines.length && isTableRow(lines[index])) {
+                rows.push(lines[index]);
+                index += 1;
+            }
+            output.push(renderTable(rows));
+        } else {
+            const cleaned = line
+                .replace(/\[\s*([^\]]+)\s*\]/g, "$1")
+                .replace(/\{x\s+([^}]+)\}/g, "$1")
+                .replace(/\{([^}]+)\}/g, "$1")
+                .replace(/\s+/g, " ")
+                .trim();
+            output.push(cleaned);
+            index += 1;
+        }
+    }
+
+    return output.join("\n");
+}
+
+function renderMarkdownContent(content) {
+    const prepared = convertMarkdownTables(formatReplyContent(content));
+
+    if (typeof marked !== "undefined" && typeof marked.parse === "function") {
+        return marked.parse(prepared);
+    }
+
+    return escapeHtml(prepared).replace(/\n/g, "<br>");
 }
 
 function createConversation() {
@@ -242,8 +307,7 @@ function renderMessages() {
         } else {
             const content = message.content || "";
             if (settings.markdownEnabled !== false) {
-                const cleaned = formatReplyContent(content);
-                bubble.innerHTML = marked.parse(cleaned);
+                bubble.innerHTML = renderMarkdownContent(content);
             } else {
                 bubble.textContent = content;
             }
