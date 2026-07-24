@@ -7,70 +7,22 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            color-scheme: dark;
+        }
         html,
         body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            background: #111;
-            color: #fff;
+            min-height: 100%;
+            background: #0f1115;
+            color: #f5f7fb;
             font-family: 'Roboto', sans-serif;
         }
         body {
             display: flex;
             flex-direction: column;
         }
-        div { font-family: 'Roboto', sans-serif; font-size: 10px; text-align: center; margin-top: 20px; }
-        .ai-container {
-            flex: 1;
-            position: relative;
-            padding-bottom: 100px;
-        }
-        #chat-box{
-            display:flex;
-            flex-direction:column;
-            gap:15px;
-            padding:20px 20px 20px 20px;
-            max-height: calc(100vh - 240px);
-            overflow-y:auto;
-            box-sizing: border-box;
-        }
-.user{
-    align-self:flex-end;
-    max-width:80%;
-    background: rgb(61, 53, 53);
-    color:white;
-    padding:14px 18px;
-    border-radius:20px 20px 5px 20px;
-    font-size:16px;
-    line-height:1.5;
-    word-wrap:break-word;
-
-}
-.bot{
-    align-self:flex-start;
-    width: fit-content;
-    max-width:min(92%, 900px);
-    background: black;
-    color:white;
-    padding:14px 18px;
-    font-size:16px;
-    line-height:1.5;
-    word-wrap:break-word;
-    text-align:left;
-    border-radius:20px 20px 20px 5px;
-}
-.bot > :first-child { margin-top: 0; }
-.bot > :last-child { margin-bottom: 0; }
-.bot pre {
-    white-space: pre-wrap;
-    overflow-x: auto;
-}
-.bot code {
-    background: rgba(255,255,255,0.12);
-    padding: 2px 4px;
-    border-radius: 4px;
-}
         .browser-header {
             background-color: #1a1a1a;
             border-bottom: 1px solid #333333;
@@ -91,7 +43,6 @@
             gap: 0px;
             color: #202124;
         }
-
         .browser-logo span:nth-child(1) { color: rgba(78, 156, 78, 0.726); }
         .browser-logo span:nth-child(2) { color: rgb(180, 96, 96); }
         .browser-logo span:nth-child(3) { color: rgb(190, 190, 107); }
@@ -99,13 +50,11 @@
         .browser-logo span:nth-child(5) { color: rgb(129, 199, 129); }
         .browser-logo span:nth-child(6) { color: rgb(187, 125, 125); }
         .browser-logo span:nth-child(7) { color: rgb(132, 132, 211); }
-
         .header-controls {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-
         .header-controls button {
             background: transparent;
             border: none;
@@ -125,7 +74,7 @@
             display: flex;
             justify-content: center;
             gap: 0;
-            margin-bottom: 40px;
+            margin: 24px 0 16px;
         }
         .logo-small {
             font-size: 24px;
@@ -133,87 +82,276 @@
             display: flex;
             justify-content: center;
             gap: 0;
-            margin-bottom: 40px;
+            margin-bottom: 12px;
             color: rgb(67, 183, 221);
         }
         .ai-container {
             flex: 1;
-            position: relative;
-            padding-bottom: 100px;
+            display: flex;
+            gap: 18px;
+            padding: 0 14px 110px;
+            min-height: 0;
         }
-        #chat-box{
-            display:flex;
-            flex-direction:column;
-            gap:15px;
-            padding:20px 20px 90px 20px;
+        .history-panel {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 18px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             max-height: calc(100vh - 240px);
-            overflow-y:auto;
+        }
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .history-header h3 {
+            margin: 0;
+            font-size: 15px;
+            color: #dfe5f2;
+        }
+        .history-header button,
+        .history-item button {
+            border: none;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+        }
+        #new-chat-btn {
+            background: #2f6fed;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+        #history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+        .history-empty {
+            padding: 14px;
+            border: 1px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            color: #b8c0ce;
+            font-size: 13px;
+            text-align: center;
+        }
+        .history-item {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            color: #f3f5f8;
+        }
+        .history-item.active {
+            background: rgba(47,111,237,0.2);
+            border-color: rgba(47,111,237,0.45);
+        }
+        .history-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .history-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .history-meta {
+            font-size: 11px;
+            color: #9aa5b3;
+        }
+        .pin-btn {
+            font-size: 13px;
+            opacity: 0.75;
+        }
+        .pin-btn.pinned {
+            color: #ffd166;
+            opacity: 1;
+        }
+        .chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            position: relative;
+        }
+        #chat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 16px 6px 120px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .empty-state {
+            margin: auto;
+            max-width: 420px;
+            text-align: center;
+            color: #9aa5b3;
+            padding: 20px;
+            border: 1px dashed rgba(255,255,255,0.18);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.03);
+        }
+        .user {
+            align-self: flex-end;
+            max-width: min(82%, 720px);
+            background: linear-gradient(135deg, #3d3535, #544a4a);
+            color: white;
+            padding: 12px 14px;
+            border-radius: 18px 18px 6px 18px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .bot {
+            align-self: flex-start;
+            width: fit-content;
+            max-width: min(92%, 860px);
+            background: #14171d;
+            color: white;
+            padding: 12px 14px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            text-align: left;
+            border-radius: 18px 18px 18px 6px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .bot > :first-child { margin-top: 0; }
+        .bot > :last-child { margin-bottom: 0; }
+        .bot pre {
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .bot code {
+            background: rgba(255,255,255,0.12);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .media-attachment {
+            margin-top: 8px;
+            max-width: 260px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.16);
+        }
+        .media-attachment img {
+            display: block;
+            width: 100%;
+        }
+        .media-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0 0;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            width: fit-content;
+            max-width: 100%;
+        }
+        .media-preview img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .ai-input {
+            position: sticky;
+            bottom: 12px;
+            width: 100%;
+            max-width: 860px;
+            align-self: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: rgba(16, 19, 23, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+        .ai-input input {
+            flex: 1;
+            height: 48px;
+            padding: 0 10px;
+            border: none;
+            outline: none;
+            border-radius: 999px;
+            background: transparent;
+            color: white;
+            font-size: 15px;
             box-sizing: border-box;
         }
-.ai-input{
-    position:fixed;
-    bottom:15px;
-    left:50%;
-    transform:translateX(-50%);
-    width:95%;
-    max-width:850px;
-    z-index:1000;
-}
-.ai-input input{
-    width:100%;
-    height:60px;
-    padding:0 70px 0 20px;
-    border:none;
-    outline:none;
-    border-radius:35px;
-    background:#2a2a2a;
-    color:white;
-    font-size:17px;
-    box-sizing:border-box;
-}
-.ai-input input::placeholder{
-    color:#b3b3b3;
-}
-.ai-input button{
-    position:absolute;
-    top:50%;
-    right:8px;
-    transform:translateY(-50%);
-    width:46px;
-    height:46px;
-    border:none;
-    border-radius:50%;
-    background:#2f6fed;
-    color:white;
-    font-size:22px;
-    cursor:pointer;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    transition:.2s;
-}
-.ai-input button:hover{
-    background:#1f5ce0;
-}
-@media(max-width:600px){
-    .ai-input{
-        width:96%;
-        bottom:10px;
-    }
-    .ai-input input{
-        height:56px;
-       font-size:16px;
-    }
-    .ai-input button{
-        width:42px;
-        height:42px;
-        font-size:20px;
-    }
-}
+        .ai-input input::placeholder {
+            color: #b3b3b3;
+        }
+        .upload-btn,
+        .submit-btn {
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .upload-btn {
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-size: 18px;
+        }
+        .submit-btn {
+            background: #2f6fed;
+            color: white;
+            font-size: 18px;
+        }
+        .upload-btn:hover { background: rgba(255,255,255,0.16); }
+        .submit-btn:hover { background: #1f5ce0; }
+        #media-input { display: none; }
+        @media (max-width: 860px) {
+            .ai-container {
+                flex-direction: column;
+                padding: 0 10px 110px;
+            }
+            .history-panel {
+                width: 100%;
+                max-height: 240px;
+            }
+        }
+        @media (max-width: 600px) {
+            .ai-input {
+                bottom: 10px;
+            }
+            .ai-input input {
+                height: 44px;
+                font-size: 14px;
+            }
+            .upload-btn,
+            .submit-btn {
+                width: 36px;
+                height: 36px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!--Browser Header-->   
     <div class="browser-header">
         <div class="browser-logo">
             <span>B</span><span>A</span><span>M</span><span>I</span><span>w</span><span>e</span><span>b</span>
@@ -224,15 +362,27 @@
         </div>
     </div>
     <div class="logo-large">
-            <span style="color: rgba(78, 156, 78, 0.726);">B</span><span style="color: rgb(180, 96, 96);">A</span><span style="color: rgb(190, 190, 107);">M</span><span style="color: rgb(100, 100, 201);">I</span><span style="color: rgb(129, 199, 129);">w</span><span style="color: rgb(187, 125, 125);">e</span><span style="color: rgb(132, 132, 211);">b</span>
-            <div class="logo-small">AI</div>
+        <span style="color: rgba(78, 156, 78, 0.726);">B</span><span style="color: rgb(180, 96, 96);">A</span><span style="color: rgb(190, 190, 107);">M</span><span style="color: rgb(100, 100, 201);">I</span><span style="color: rgb(129, 199, 129);">w</span><span style="color: rgb(187, 125, 125);">e</span><span style="color: rgb(132, 132, 211);">b</span>
+        <div class="logo-small">AI</div>
     </div>
     <div class="ai-container">
-        <div id="chat-box"></div>
-        <form id="chat-form" class="ai-input">
-            <input type="text" id="user-input" placeholder="Type your message here...">
-            <button type="submit"><b>&#10148;</b></button>
-        </form>
+        <aside class="history-panel">
+            <div class="history-header">
+                <h3>Chats</h3>
+                <button id="new-chat-btn" type="button">New chat</button>
+            </div>
+            <div id="history-list"></div>
+        </aside>
+        <div class="chat-panel">
+            <div id="chat-box"></div>
+            <div id="media-preview" class="media-preview" hidden></div>
+            <form id="chat-form" class="ai-input">
+                <input type="file" id="media-input" accept="image/*">
+                <button class="upload-btn" id="upload-btn" type="button" title="Add image">📷</button>
+                <input type="text" id="user-input" placeholder="Type your message here...">
+                <button class="submit-btn" type="submit" title="Send">➤</button>
+            </form>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="ai.js"></script>
