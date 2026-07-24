@@ -97,17 +97,19 @@ function normalizeLatexNotation(text) {
             const trimmed = line.trim();
             if (!trimmed) return line;
             if (/^\s*\|.*\|/.test(trimmed)) return line;
+            if (/^\s*[-:| ]+$/.test(trimmed)) return line;
             if (/^```/.test(trimmed)) return line;
 
             let normalized = line;
-            normalized = normalized.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "($1)/($2)");
-            normalized = normalized.replace(/\\dfrac\{([^{}]+)\}\{([^{}]+)\}/g, "($1)/($2)");
+            normalized = normalized.replace(/\\frac\s*\{?([^{}]+)\}?\s*\{?([^{}]+)\}?/g, "($1)/($2)");
+            normalized = normalized.replace(/\\dfrac\s*\{?([^{}]+)\}?\s*\{?([^{}]+)\}?/g, "($1)/($2)");
             normalized = normalized.replace(/\\left|\\right/g, "");
             normalized = normalized.replace(/\\cdot/g, " × ");
             normalized = normalized.replace(/\\times/g, " × ");
-            normalized = normalized.replace(/\\sqrt\{([^{}]+)\}/g, "sqrt($1)");
-            normalized = normalized.replace(/\\text\{([^{}]+)\}/g, "$1");
+            normalized = normalized.replace(/\\sqrt\s*\{([^{}]+)\}/g, "sqrt($1)");
+            normalized = normalized.replace(/\\text\s*\{([^{}]+)\}/g, "$1");
             normalized = normalized.replace(/\\([A-Za-z]+)/g, "");
+            normalized = normalized.replace(/\{([^{}]+)\}/g, "$1");
             normalized = normalized.replace(/\s+/g, " ").trim();
             return normalized;
         })
@@ -118,16 +120,10 @@ function formatReplyContent(content) {
     let text = String(content || "").trim().replace(/\r/g, "");
 
     text = normalizeLatexNotation(text);
-    text = text.replace(/\[\s*([^\]]+)\s*\]/g, "$1");
-    text = text.replace(/\*\*\*([^*]+)\*\*\*/g, "$1");
-    text = text.replace(/\*\*([^*]+)\*\*/g, "$1");
-    text = text.replace(/\*([^*]+)\*/g, "$1");
     text = text.replace(/(^|\n)(Step\s+\d+|Answer|Final Answer|Solution|Explanation|Result)\s*:/gim, "$1**$2:**");
     text = text.replace(/(^|\n)(\d+)\.\s+/gm, "$1$2. ");
     text = text.replace(/\n{3,}/g, "\n\n");
     text = text.replace(/\n(?=\d+\.)/g, "\n");
-    text = text.replace(/\s+\|/g, " |");
-    text = text.replace(/\|\s+/g, "| ");
 
     return text;
 }
