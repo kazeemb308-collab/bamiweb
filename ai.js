@@ -88,9 +88,27 @@ function escapeHtml(value) {
         .replace(/'/g, "&#39;");
 }
 
+function normalizeLatexNotation(text) {
+    let value = String(text || "").trim();
+
+    value = value.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "($1)/($2)");
+    value = value.replace(/\\dfrac\{([^{}]+)\}\{([^{}]+)\}/g, "($1)/($2)");
+    value = value.replace(/\\left|\\right/g, "");
+    value = value.replace(/\\cdot/g, " × ");
+    value = value.replace(/\\times/g, " × ");
+    value = value.replace(/\\sqrt\{([^{}]+)\}/g, "sqrt($1)");
+    value = value.replace(/\\text\{([^{}]+)\}/g, "$1");
+    value = value.replace(/\\([A-Za-z]+)/g, "");
+    value = value.replace(/\{([^{}]+)\}/g, "$1");
+    value = value.replace(/\s+/g, " ").trim();
+
+    return value;
+}
+
 function formatReplyContent(content) {
     let text = String(content || "").trim().replace(/\r/g, "");
 
+    text = normalizeLatexNotation(text);
     text = text.replace(/(^|\n)(Step\s+\d+|Answer|Final Answer|Solution|Explanation|Result)\s*:/gim, "$1**$2:**");
     text = text.replace(/(^|\n)(\d+)\.\s+/gm, "$1$2. ");
     text = text.replace(/\n{3,}/g, "\n\n");
