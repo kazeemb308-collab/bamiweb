@@ -22,10 +22,10 @@ export default async function handler(req, res) {
     }
 
     const styleInstruction = responseStyle === "concise"
-        ? "Reply concisely and directly."
+        ? "Reply concisely and directly. Use short paragraphs, bullets, and a clean structure."
         : responseStyle === "detailed"
-            ? "Reply in a detailed and helpful manner."
-            : "Reply in a balanced and practical manner.";
+            ? "Reply in a detailed, polished, and well-structured way. Use headings, bullet points, and clear examples when helpful."
+            : "Reply in a balanced, polished, and helpful way. Use clear paragraphs, bullet points, and easy-to-read formatting.";
 
     const historyMessages = (conversationHistory || []).slice(-8).map((entry) => {
         if (entry.image) {
@@ -72,7 +72,7 @@ export default async function handler(req, res) {
                 messages: [
                     {
                         role: "system",
-                        content: `You are BAMI AI, a helpful assistant inside BAMIweb. ${styleInstruction}`
+                        content: `You are BAMI AI, a polished assistant inside BAMIweb. ${styleInstruction} Format the answer like a modern AI assistant: clear, structured, and easy to read. Avoid raw dumps of data unless the user asks for them.`
                     },
                     ...historyMessages,
                     currentMessage

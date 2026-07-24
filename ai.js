@@ -202,10 +202,14 @@ function renderMessages() {
                 bubble.appendChild(imageWrap);
             }
         } else {
+            const content = message.content || "";
             if (settings.markdownEnabled !== false) {
-                bubble.innerHTML = marked.parse(message.content || "");
+                const cleaned = String(content)
+                    .replace(/\n{3,}/g, "\n\n")
+                    .trim();
+                bubble.innerHTML = marked.parse(cleaned);
             } else {
-                bubble.textContent = message.content || "";
+                bubble.textContent = content;
             }
         }
 

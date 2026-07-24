@@ -343,11 +343,32 @@
         .bot pre {
             white-space: pre-wrap;
             overflow-x: auto;
+            background: rgba(255,255,255,0.08);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
         }
         .bot code {
             background: rgba(255,255,255,0.12);
             padding: 2px 4px;
             border-radius: 4px;
+        }
+        .bot ul,
+        .bot ol {
+            padding-left: 18px;
+            margin: 8px 0;
+        }
+        .bot p {
+            margin: 0 0 8px;
+        }
+        .bot p:last-child {
+            margin-bottom: 0;
+        }
+        .bot blockquote {
+            margin: 8px 0;
+            padding-left: 10px;
+            border-left: 3px solid #2f6fed;
+            color: #c7d2e5;
         }
         .media-attachment {
             margin-top: 8px;
