@@ -38,7 +38,7 @@
         .browser-logo {
             font-size: 24px;
             font-weight: 700;
-            display: flex;
+            display: absolute;
             align-items: center;
             gap: 0px;
             color: #202124;
@@ -298,7 +298,7 @@
         #chat-box {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
             padding: 16px 6px 150px;
             overflow-y: auto;
             flex: 1;
@@ -318,10 +318,10 @@
             max-width: min(82%, 720px);
             background: linear-gradient(135deg, #3d3535, #544a4a);
             color: white;
-            padding: 12px 14px;
+            padding: 14px 16px;
             border-radius: 18px 18px 6px 18px;
             font-size: 15px;
-            line-height: 1.5;
+            line-height: 1.65;
             word-wrap: break-word;
         }
         .bot {
@@ -330,9 +330,9 @@
             max-width: min(92%, 860px);
             background: #14171d;
             color: white;
-            padding: 12px 14px;
+            padding: 14px 16px;
             font-size: 15px;
-            line-height: 1.5;
+            line-height: 1.65;
             word-wrap: break-word;
             text-align: left;
             border-radius: 18px 18px 18px 6px;
@@ -344,50 +344,61 @@
             white-space: pre-wrap;
             overflow-x: auto;
             background: rgba(255,255,255,0.08);
-            padding: 10px;
+            padding: 12px;
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.08);
+            font-size: 13px;
+            line-height: 1.6;
         }
         .bot code {
             background: rgba(255,255,255,0.12);
-            padding: 2px 4px;
+            padding: 3px 6px;
             border-radius: 4px;
+            font-size: 13px;
         }
         .bot ul,
         .bot ol {
-            padding-left: 18px;
-            margin: 8px 0;
+            padding-left: 20px;
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+        .bot li {
+            margin: 6px 0;
         }
         .bot p {
-            margin: 0 0 8px;
+            margin: 0 0 10px;
         }
         .bot p:last-child {
             margin-bottom: 0;
         }
         .bot blockquote {
-            margin: 8px 0;
-            padding-left: 10px;
+            margin: 10px 0;
+            padding: 10px 12px;
             border-left: 3px solid #2f6fed;
+            background: rgba(47,111,237,0.1);
             color: #c7d2e5;
+            border-radius: 6px;
         }
         .bot table {
             width: 100%;
             border-collapse: collapse;
-            margin: 10px 0;
+            margin: 12px 0;
             font-size: 13px;
             background: rgba(255,255,255,0.03);
             border-radius: 10px;
-            overflow: hidden;
+            overflow-x: auto;
+            display: block;
         }
         .bot th,
         .bot td {
             border: 1px solid rgba(255,255,255,0.12);
-            padding: 8px 10px;
+            padding: 10px 12px;
             text-align: left;
         }
         .bot th {
             background: rgba(47,111,237,0.2);
             color: #e8f0ff;
+            font-weight: 600;
         }
         .bot tr:nth-child(even) td {
             background: rgba(255,255,255,0.03);
@@ -502,6 +513,80 @@
             .submit-btn {
                 width: 36px;
                 height: 36px;
+                font-size: 16px;
+            }
+            .bot {
+                max-width: 95%;
+                padding: 12px 14px;
+            }
+            .user {
+                max-width: 95%;
+                padding: 12px 14px;
+            }
+            .bot p {
+                margin: 0 0 12px;
+                line-height: 1.7;
+                word-spacing: 0.05em;
+            }
+            .bot ul,
+            .bot ol {
+                padding-left: 18px;
+                margin: 12px 0;
+                line-height: 1.8;
+            }
+            .bot table {
+                font-size: 12px;
+                margin: 12px -2px;
+            }
+            .bot th,
+            .bot td {
+                padding: 8px 10px;
+            }
+            .bot pre {
+                padding: 10px;
+                font-size: 12px;
+                line-height: 1.7;
+                margin: 8px 0;
+            }
+            .bot code {
+                font-size: 12px;
+            }
+            #chat-box {
+                gap: 14px;
+                padding: 12px 4px 130px;
+            }
+        }
+        @media (max-width: 480px) {
+            .browser-header {
+                padding: 10px 12px;
+            }
+            .logo-large {
+                font-size: 48px;
+                margin: 16px 0 12px;
+            }
+            .bot, .user {
+                max-width: 98%;
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+            .bot p {
+                margin: 0 0 14px;
+                line-height: 1.75;
+            }
+            .bot table {
+                font-size: 11px;
+                margin: 10px 0;
+            }
+            .bot th,
+            .bot td {
+                padding: 6px 8px;
+            }
+            #chat-box {
+                gap: 12px;
+                padding: 10px 2px 120px;
+            }
+            .media-attachment {
+                max-width: 200px;
             }
         }
     </style>
