@@ -32,7 +32,7 @@ const DEFAULT_SETTINGS = {
 
 let conversations = loadConversations();
 let activeConversationId = null;
-let pendingImageData = null;
+let pendingAttachment = null;
 let settings = loadSettings();
 
 function loadConversations() {
@@ -216,19 +216,34 @@ function renderMessages() {
 }
 
 function clearAttachment() {
-    pendingImageData = null;
+    pendingAttachment = null;
     mediaInput.value = "";
     mediaPreview.innerHTML = "";
     mediaPreview.hidden = true;
 }
 
-function showAttachmentPreview(dataUrl) {
-    pendingImageData = dataUrl;
+function showAttachmentPreview(file, dataUrl, text) {
+    pendingAttachment = {
+        kind: file.type.startsWith("image/") ? "image" : "file",
+        name: file.name,
+        type: file.type || "application/octet-stream",
+        size: file.size,
+        dataUrl: dataUrl || null,
+        text: text || ""
+    };
     mediaPreview.hidden = false;
-    mediaPreview.innerHTML = `
-        <img src="${dataUrl}" alt="Selected image preview">
-        <span>Image ready to send</span>
-    `;
+
+    if (file.type.startsWith("image/")) {
+        mediaPreview.innerHTML = `
+            <img src="${dataUrl}" alt="Selected image preview">
+            <span>${escapeHtml(file.name)}</span>
+        `;
+    } else {
+        mediaPreview.innerHTML = `
+            <div style="font-size: 14px; font-weight: 600;">${escapeHtml(file.name)}</div>
+            <div style="font-size: 12px; color: #b8c0ce;">${escapeHtml(text ? "Text attachment ready" : "File ready to send")}</div>
+        `;
+    }
 }
 
 function appendThinking() {
@@ -250,6 +265,14 @@ function closeHistory() {
     historyPanel.classList.remove("open");
     historyBackdrop.classList.remove("show");
     historyToggle.setAttribute("aria-expanded", "false");
+}
+
+function toggleHistory() {
+    if (historyPanel.classList.contains("open")) {
+        closeHistory();
+    } else {
+        openHistory();
+    }
 }
 
 function openSettings() {
@@ -277,13 +300,14 @@ form.addEventListener("submit", async function (e) {
 
     const conversation = ensureActiveConversation();
     const message = input.value.trim();
-    if (!message && !pendingImageData) return;
+    if (!message && !pendingAttachment) return;
 
-    const userText = message || (pendingImageData ? "Shared an image" : "");
+    const userText = message || (pendingAttachment ? (pendingAttachment.kind === "image" ? "Shared an image" : "Shared a file") : "");
     const userMessage = {
         role: "user",
         content: userText,
-        image: pendingImageData || null
+        image: pendingAttachment && pendingAttachment.kind === "image" ? pendingAttachment.dataUrl : null,
+        attachment: pendingAttachment || null
     };
 
     conversation.messages.push(userMessage);
@@ -304,7 +328,8 @@ form.addEventListener("submit", async function (e) {
             },
             body: JSON.stringify({
                 message: userText,
-                imageDataUrl: pendingImageData,
+                imageDataUrl: pendingAttachment && pendingAttachment.kind === "image" ? pendingAttachment.dataUrl : null,
+                attachment: pendingAttachment,
                 imageEnabled: settings.imageEnabled !== false,
                 model: settings.model || DEFAULT_SETTINGS.model,
                 temperature: Number(settings.temperature ?? DEFAULT_SETTINGS.temperature),
@@ -417,9 +442,28 @@ mediaInput.addEventListener("change", () => {
     const file = mediaInput.files && mediaInput.files[0];
     if (!file) return;
 
+    if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            showAttachmentPreview(file, reader.result, "");
+        };
+        reader.readAsDataURL(file);
+        return;
+    }
+
+    const isTextLike = file.type.startsWith("text/") || ["application/json", "application/xml", "application/javascript", "application/x-javascript", "application/pdf"].includes(file.type);
+    if (isTextLike) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            showAttachmentPreview(file, null, reader.result);
+        };
+        reader.readAsText(file);
+        return;
+    }
+
     const reader = new FileReader();
     reader.onload = function () {
-        showAttachmentPreview(reader.result);
+        showAttachmentPreview(file, reader.result, "");
     };
     reader.readAsDataURL(file);
 });
