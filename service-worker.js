@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bamiweb-pwa-v1';
+const CACHE_NAME = 'bamiweb-pwa-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,7 +6,9 @@ const APP_SHELL = [
   './pwa.js',
   './favicon.png',
   './icons/icon-192.svg',
-  './icons/icon-512.svg'
+  './icons/icon-512.svg',
+  './screenshots/desktop.png',
+  './screenshots/mobile.png'
 ];
 
 self.addEventListener('install', (event) => {
