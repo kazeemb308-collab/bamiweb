@@ -806,7 +806,7 @@
             let text = input.value.trim();
             if (!text) return;
 
-            const url = buildUrl(text) || `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+            const url = buildUrl(text) || `https://searx.be/?q=${encodeURIComponent(text)}`;
             window.location.href = url;
         });
         // Local Storage Keys
@@ -1070,7 +1070,7 @@
             const name = tabId ? 'bami-search-' + tabId : '_blank';
             const url = buildUrl(query)
                 ? buildUrl(query)
-                : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                : `https://searx.be/?q=${encodeURIComponent(query)}`;
             try {
                 const win = window.open(url, name, 'noopener,noreferrer');
                 if (win) {
@@ -1094,8 +1094,8 @@
             const url = query
                 ? buildUrl(query)
                     ? buildUrl(query)
-                    : `https://www.google.com/search?q=${encodeURIComponent(query)}`
-                : 'https://www.google.com';
+                    : `https://searx.be/?q=${encodeURIComponent(query)}`
+                : 'https://searx.be/';
             try { window.open(url, name); } catch (e) {}
         }
 
@@ -1114,33 +1114,7 @@
             const localMatches = getLocalSuggestions(query);
             renderSuggestions(localMatches);
 
-            const requestId = ++activeRequestId;
-            const callbackName = `bamiSuggest${Date.now()}${Math.floor(Math.random() * 100000)}`;
-
-            window[callbackName] = (data) => {
-                delete window[callbackName];
-                if (requestId !== activeRequestId) return;
-
-                const remoteItems = Array.isArray(data?.[1])
-                    ? data[1].filter(Boolean).map(item => String(item).trim())
-                    : [];
-
-                const combined = [...new Set([...remoteItems, ...localMatches])].slice(0, 10);
-                renderSuggestions(combined);
-            };
-
-            const script = document.createElement('script');
-            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&hl=en&q=${encodeURIComponent(query)}&callback=${callbackName}`;
-            script.async = true;
-            script.onerror = () => {
-                if (requestId === activeRequestId) renderSuggestions(localMatches);
-            };
-
-            if (pendingScript) pendingScript.remove();
-            document.body.appendChild(script);
-            pendingScript = script;
-
-            setTimeout(() => { if (script.parentNode) script.parentNode.removeChild(script); }, 4000);
+            renderSuggestions(localMatches);
         }
 
         function renderSuggestions(items) {
@@ -1171,7 +1145,7 @@
             updateActiveTabQuery(value);
             const url = buildUrl(value)
                 ? buildUrl(value)
-                : `https://www.google.com/search?q=${encodeURIComponent(value)}`;
+                : `https://searx.be/?q=${encodeURIComponent(value)}`;
             addToHistory('Search: ' + value, url);
 
             try {
