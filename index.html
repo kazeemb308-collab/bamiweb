@@ -1112,9 +1112,35 @@
             }
 
             const localMatches = getLocalSuggestions(query);
-            renderSuggestions(localMatches);
+            const requestId = ++activeRequestId;
+            const callbackName = `bamiSuggest${Date.now()}${Math.floor(Math.random() * 100000)}`;
 
-            renderSuggestions(localMatches);
+            window[callbackName] = (data) => {
+                delete window[callbackName];
+                if (requestId !== activeRequestId) return;
+
+                const remoteItems = Array.isArray(data?.[1])
+                    ? data[1].filter(Boolean).map(item => String(item).trim())
+                    : [];
+
+                const combined = [...new Set([...remoteItems, ...localMatches])].slice(0, 10);
+                renderSuggestions(combined);
+            };
+
+            const script = document.createElement('script');
+            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&hl=en&q=${encodeURIComponent(query)}&callback=${callbackName}`;
+            script.async = true;
+            script.onerror = () => {
+                if (requestId === activeRequestId) renderSuggestions(localMatches);
+            };
+
+            if (pendingScript) pendingScript.remove();
+            document.body.appendChild(script);
+            pendingScript = script;
+
+            setTimeout(() => {
+                if (script.parentNode) script.parentNode.removeChild(script);
+            }, 4000);
         }
 
         function renderSuggestions(items) {
