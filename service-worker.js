@@ -1,15 +1,18 @@
-const CACHE_NAME = 'bamiweb-pwa-v2';
+const CACHE_NAME = 'bamiweb-pwa-v3';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './pwa.js',
+  './service-worker.js',
   './favicon.png',
+  './darkmode.css',
+  './ai.js',
   './icons/icon-192.svg',
-  './icons/icon-512.svg',
-  './screenshots/desktop.png',
-  './screenshots/mobile.png'
+  './icons/icon-512.svg'
 ];
+
+const isSameOrigin = (request) => new URL(request.url).origin === self.location.origin;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -20,21 +23,46 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.map((key) => key !== CACHE_NAME && caches.delete(key))))
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
   );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  const { request } = event;
 
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        const responseClone = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-        return networkResponse;
+  if (request.method !== 'GET' || !isSameOrigin(request)) return;
+
+  const destination = request.destination || 'document';
+
+  if (request.mode === 'navigate' || destination === 'document') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+          return response;
+        })
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  if (['script', 'style', 'image', 'font', 'manifest'].includes(destination)) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        const networkFetch = fetch(request)
+          .then((response) => {
+            if (response && response.ok) {
+              const responseClone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+            }
+            return response;
+          })
+          .catch(() => null);
+
+        return cached || networkFetch || caches.match('./index.html');
       })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./index.html')))
-  );
+    );
+  }
 });
