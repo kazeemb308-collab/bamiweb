@@ -115,6 +115,11 @@
             background: #1a73e8;
             color: #fff;
             font-size: 20px;
+            cursor: pointer;
+        }
+
+        .new-tab:hover {
+            background: #1558c0;
         }
 
         .header-search {
@@ -172,6 +177,7 @@
             color: #fff;
             font-size: 15px;
             font-weight: 600;
+            cursor: pointer;
         }
 
         .search-btn:hover {
@@ -181,7 +187,8 @@
         .browser-view {
             padding: 18px;
             background: #f1f3f4;
-            min-height: calc(100vh - 220px);
+            min-height: calc(100vh - 250px);
+            overflow: hidden;
         }
 
         .results-card {
@@ -197,12 +204,14 @@
 
         .page-viewer {
             width: 100%;
-            min-height: 380px;
-            padding: 36px 34px;
+            height: 100%;
+            min-height: 420px;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+            border-radius: 16px;
+            overflow: hidden;
         }
 
         .page-frame {
@@ -215,6 +224,7 @@
         .welcome {
             text-align: center;
             color: #5f6368;
+            padding: 36px 34px;
         }
 
         .welcome i {
@@ -230,88 +240,6 @@
 
         .welcome p {
             font-size: 16px;
-            margin: 0;
-        }
-
-        .search-loading,
-        .search-error,
-        .search-results {
-            width: 100%;
-            max-width: 860px;
-            margin: 0 auto;
-            text-align: left;
-            color: #202124;
-        }
-
-        .search-loading,
-        .search-error,
-        .search-results {
-            background: #f8f9fa;
-            border: 1px solid #e8eaed;
-            border-radius: 18px;
-            padding: 28px;
-        }
-
-        .search-loading h2,
-        .search-error h2,
-        .search-results h2 {
-            margin: 0 0 8px;
-            font-size: 24px;
-        }
-
-        .search-loading p,
-        .search-error p,
-        .search-results p {
-            margin: 12px 0;
-            line-height: 1.6;
-            color: #5f6368;
-        }
-
-        .launch-btn,
-        .open-search-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 16px;
-            padding: 12px 18px;
-            border: none;
-            border-radius: 999px;
-            background: #1a73e8;
-            color: #fff;
-            font-size: 15px;
-            cursor: pointer;
-        }
-
-        .result-item {
-            margin-bottom: 22px;
-            padding-bottom: 18px;
-            border-bottom: 1px solid #e8eaed;
-        }
-
-        .result-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .result-title {
-            font-size: 18px;
-            margin: 0 0 6px;
-            color: #1a0dab;
-            text-decoration: none;
-        }
-
-        .result-url {
-            color: #006621;
-            font-size: 14px;
-            margin: 0 0 8px;
-            display: block;
-        }
-
-        .result-snippet {
-            color: #4d5156;
-            font-size: 15px;
-            line-height: 1.6;
             margin: 0;
         }
     </style>
@@ -345,354 +273,246 @@
             <button id="new-tab" class="new-tab">+</button>
             <button id="close-tab-btn" class="tab-button">&times;</button>
         </div>
-        <div class="browser-view">
-            <div class="results-card">
-                <div id="page-viewer" class="page-viewer">
-                    <div class="welcome">
-                        <i class="fa-solid fa-globe"></i>
-                        <h2>Welcome to BAMI Browser</h2>
-                        <p>Use the search bar above to search the web and see results here.</p>
-                    </div>
+    </div>
+    <div class="browser-view">
+        <div class="results-card">
+            <div id="page-viewer" class="page-viewer">
+                <div class="welcome">
+                    <i class="fa-solid fa-globe"></i>
+                    <h2>Welcome to BAMI Browser</h2>
+                    <p>Use the search bar above to search the web and see results here.</p>
                 </div>
             </div>
         </div>
-        <script>
-            const searchForm = document.getElementById("searchForm");
-            const searchInput = document.getElementById("searchInput");
-            const backBtn = document.getElementById("back-btn");
-            const forwardBtn = document.getElementById("forward-btn");
-            const refreshBtn = document.getElementById("refresh-btn");
-            const homeBtn = document.getElementById("home-btn");
-            const tabsContainer = document.querySelector(".browser-tabs");
-            const newTabBtn = document.getElementById("new-tab");
-            const closeTabBtn = document.getElementById("close-tab-btn");
-            const pageViewer = document.getElementById("page-viewer");
+    </div>
+    <script>
+        const searchForm = document.getElementById("searchForm");
+        const searchInput = document.getElementById("searchInput");
+        const backBtn = document.getElementById("back-btn");
+        const forwardBtn = document.getElementById("forward-btn");
+        const refreshBtn = document.getElementById("refresh-btn");
+        const homeBtn = document.getElementById("home-btn");
+        const tabsContainer = document.querySelector(".browser-tabs");
+        const newTabBtn = document.getElementById("new-tab");
+        const closeTabBtn = document.getElementById("close-tab-btn");
+        const pageViewer = document.getElementById("page-viewer");
 
-            const tabsState = [
-                { id: 'tab-1', label: '1', query: '', url: '' }
-            ];
-            const tabFrames = {};
-            let activeTabId = 'tab-1';
-            let tabCount = 1;
-
-            function isLink(query) {
-                const trimmed = query.trim();
-                return /^(https?:\/\/|www\.|[a-zA-Z0-9.-]+\.[a-z]{2,})(\/|$)/i.test(trimmed);
+        // Tab state with individual history for each tab
+        const tabsState = [
+            { 
+                id: 'tab-1', 
+                label: '1', 
+                currentUrl: '', 
+                history: [],
+                historyIndex: -1
             }
+        ];
+        const tabFrames = {};
+        let activeTabId = 'tab-1';
+        let tabCount = 1;
 
-            function buildUrl(query) {
-                const trimmed = query.trim();
-                if (!trimmed) return '';
-                if (/^(https?:\/\/)/i.test(trimmed)) return trimmed;
-                if (/^www\./i.test(trimmed)) return 'https://' + trimmed;
-                if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/i.test(trimmed)) return 'https://' + trimmed;
-                return '';
-            }
+        function isLink(query) {
+            const trimmed = query.trim();
+            return /^(https?:\/\/|www\.|[a-zA-Z0-9.-]+\.[a-z]{2,})(\/|$)/i.test(trimmed);
+        }
 
-            function buildSearchUrl(query) {
-                const trimmed = query.trim();
-                if (!trimmed) return '';
-                return `https://www.google.com/search?q=${encodeURIComponent(trimmed)}`;
-            }
+        function buildUrl(query) {
+            const trimmed = query.trim();
+            if (!trimmed) return '';
+            if (/^(https?:\/\/)/i.test(trimmed)) return trimmed;
+            if (/^www\./i.test(trimmed)) return 'https://' + trimmed;
+            if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/i.test(trimmed)) return 'https://' + trimmed;
+            return '';
+        }
 
-            function openSearch(query) {
-                const url = buildSearchUrl(query);
-                if (!url) return;
-                window.location.href = url;
-            }
+        function getTabs() {
+            return Array.from(document.querySelectorAll('.tab'));
+        }
 
-            function loadInitialQuery() {
-                const params = new URLSearchParams(window.location.search);
-                const q = params.get('q');
-                if (!q) return;
-                const activeState = getActiveTabState();
-                activeState.query = q;
-                if (isLink(q)) {
-                    activeState.url = buildUrl(q);
-                } else {
-                    activeState.url = '';
-                    openSearch(q);
-                }
-                if (searchInput) searchInput.value = q;
-            }
+        function getTabButtonById(id) {
+            return document.querySelector(`.tab[data-tab-id="${id}"]`);
+        }
 
-            function getTabs() {
-                return Array.from(document.querySelectorAll('.tab'));
-            }
+        function getActiveTabState() {
+            return tabsState.find(tab => tab.id === activeTabId) || tabsState[0];
+        }
 
-            function getTabButtonById(id) {
-                return document.querySelector(`.tab[data-tab-id="${id}"]`);
-            }
-
-            function getActiveTabIndex() {
-                return tabsState.findIndex(tab => tab.id === activeTabId);
-            }
-
-            function getActiveTabState() {
-                return tabsState.find(tab => tab.id === activeTabId) || tabsState[0];
-            }
-
-            function activateTab(tab) {
-                if (!tab) return;
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                activeTabId = tab.dataset.tabId;
-                const activeState = getActiveTabState();
-                if (activeState) {
-                    searchInput.value = activeState.query || '';
-                    renderActiveTabContent();
-                }
-            }
-
-            function createTabButton(state) {
-                const tab = document.createElement('button');
-                tab.className = 'tab';
-                tab.dataset.tabId = state.id;
-                tab.innerHTML = `<span>${state.label}</span>`;
-                tab.addEventListener('click', () => activateTab(tab));
-                return tab;
-            }
-
-            function createTabState() {
-                tabCount += 1;
-                const id = `tab-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-                const state = { id, label: `${tabCount}`, query: '', url: '' };
-                tabsState.push(state);
-                return state;
-            }
-
-            function renderSearchLoading(query) {
-                pageViewer.innerHTML = `
-                    <div class="search-loading">
-                        <h2>Searching for “${query}”</h2>
-                        <p>Please wait while results are loaded.</p>
-                    </div>`;
-            }
-
-            function renderSearchError(query) {
-                pageViewer.innerHTML = `
-                    <div class="search-error">
-                        <h2>Unable to load results</h2>
-                        <p>There was a problem loading results for “${query}”. Please try again.</p>
-                        <p><a href="https://www.google.com/search?q=${encodeURIComponent(query)}" target="_blank" rel="noopener noreferrer">Open Google search</a></p>
-                    </div>`;
-            }
-
-            function renderDuckResults(query, data) {
-                const activeState = getActiveTabState();
-                pageViewer.innerHTML = '';
-                const results = document.createElement('div');
-                results.className = 'search-results';
-                let html = `
-                    <h2>Search results for “${query}”</h2>
-                `;
-
-                if (data.Heading) {
-                    html += `<p class="result-snippet"><strong>${data.Heading}</strong></p>`;
-                }
-                if (data.AbstractText) {
-                    html += `<p class="result-snippet">${data.AbstractText}</p>`;
-                }
-                if (data.Answer) {
-                    html += `<p class="result-snippet">${data.Answer}</p>`;
-                }
-
-                results.innerHTML = html;
-                pageViewer.appendChild(results);
-
-                const items = [];
-                if (Array.isArray(data.RelatedTopics)) {
-                    data.RelatedTopics.forEach(item => {
-                        if (item.Topics) {
-                            item.Topics.forEach(sub => {
-                                if (sub.FirstURL && sub.Text) {
-                                    items.push({ title: sub.Text, url: sub.FirstURL, snippet: '' });
-                                }
-                            });
-                        } else if (item.FirstURL && item.Text) {
-                            items.push({ title: item.Text, url: item.FirstURL, snippet: '' });
-                        }
-                    });
-                }
-                if (Array.isArray(data.Results)) {
-                    data.Results.forEach(item => {
-                        if (item.FirstURL && item.Text) {
-                            items.push({ title: item.Text, url: item.FirstURL, snippet: item.Result || '' });
-                        }
-                    });
-                }
-
-                if (!items.length) {
-                    const empty = document.createElement('div');
-                    empty.className = 'search-error';
-                    empty.innerHTML = `
-                        <h2>No results found</h2>
-                        <p>Try another search term.</p>
-                    `;
-                    pageViewer.appendChild(empty);
-                    return;
-                }
-
-                items.slice(0, 10).forEach(item => {
-                    const box = document.createElement('div');
-                    box.className = 'result-item';
-                    box.innerHTML = `
-                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="result-title">${item.title}</a>
-                        <span class="result-url">${item.url}</span>
-                        <p class="result-snippet">${item.snippet}</p>
-                    `;
-                    pageViewer.appendChild(box);
-                });
-
-                activeState.ddgData = data;
-            }
-
-            function fetchDuckDuckGoSearch(query) {
-                const activeState = getActiveTabState();
-                if (activeState.ddgData && activeState.query === query) {
-                    renderDuckResults(query, activeState.ddgData);
-                    return;
-                }
-                renderSearchLoading(query);
-                const callbackName = `ddgJsonp_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-                const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1&no_html=1&skip_disambig=1&callback=${callbackName}`;
-                let timer;
-
-                window[callbackName] = (data) => {
-                    clearTimeout(timer);
-                    cleanup();
-                    if (getActiveTabState().query !== query) return;
-                    activeState.ddgData = data;
-                    renderDuckResults(query, data);
-                };
-
-                const script = document.createElement('script');
-                script.src = url;
-                script.async = true;
-                script.onerror = () => {
-                    clearTimeout(timer);
-                    cleanup();
-                    renderSearchError(query);
-                };
-
-                function cleanup() {
-                    delete window[callbackName];
-                    if (script.parentNode) script.parentNode.removeChild(script);
-                }
-
-                document.body.appendChild(script);
-                timer = setTimeout(() => {
-                    cleanup();
-                    renderSearchError(query);
-                }, 10000);
-            }
-
-            function renderActiveTabContent() {
-                const active = getActiveTabState();
-                pageViewer.innerHTML = '';
-                if (!active.url && !active.query) {
-                    searchInput.value = active.query || '';
-                    pageViewer.innerHTML = `
-                        <div class="welcome">
-                            <i class="fa-solid fa-globe"></i>
-                            <h2>Welcome to BAMI Browser</h2>
-                            <p>Use the search bar above to search the web and see results here.</p>
-                        </div>`;
-                    return;
-                }
-
-                if (active.url) {
-                    if (!tabFrames[active.id]) {
-                        const iframe = document.createElement('iframe');
-                        iframe.id = `iframe-${active.id}`;
-                        iframe.className = 'page-frame';
-                        iframe.src = active.url;
-                        iframe.title = active.query || active.url;
-                        tabFrames[active.id] = iframe;
-                    } else {
-                        tabFrames[active.id].src = active.url;
-                        tabFrames[active.id].title = active.query || active.url;
-                    }
-                    pageViewer.appendChild(tabFrames[active.id]);
-                    return;
-                }
-
-                fetchDuckDuckGoSearch(active.query);
-            }
-
-            function navigateTab(direction) {
-                const index = getActiveTabIndex();
-                if (index === -1) return;
-                const nextIndex = index + direction;
-                if (nextIndex < 0 || nextIndex >= tabsState.length) return;
-                const nextTab = getTabButtonById(tabsState[nextIndex].id);
-                if (nextTab) activateTab(nextTab);
-            }
-
-            if (searchForm && searchInput) {
-                searchForm.addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    const query = searchInput.value.trim();
-                    if (!query) return;
-                    const activeState = getActiveTabState();
-                    activeState.query = query;
-                    if (isLink(query)) {
-                        activeState.url = buildUrl(query);
-                        activeState.aiResponse = null;
-                        if (tabFrames[activeState.id]) {
-                            delete tabFrames[activeState.id];
-                        }
-                    } else {
-                        activeState.url = '';
-                        activeState.aiResponse = null;
-                        openSearch(query);
-                        return;
-                    }
-                    renderActiveTabContent();
-                });
-            }
-
-            if (newTabBtn && tabsContainer) {
-                newTabBtn.addEventListener('click', function () {
-                    const state = createTabState();
-                    const tab = createTabButton(state);
-                    tabsContainer.insertBefore(tab, newTabBtn);
-                    activateTab(tab);
-                });
-            }
-
-            if (closeTabBtn) {
-                closeTabBtn.addEventListener('click', function () {
-                    const tabs = getTabs();
-                    if (tabs.length <= 1) {
-                        alert('You must keep at least one tab.');
-                        return;
-                    }
-                    const activeState = getActiveTabState();
-                    const activeTabButton = getTabButtonById(activeState.id);
-                    if (activeTabButton) activeTabButton.remove();
-                    const removedIndex = tabsState.findIndex(tab => tab.id === activeState.id);
-                    tabsState.splice(removedIndex, 1);
-                    delete tabFrames[activeState.id];
-                    const newIndex = Math.min(removedIndex, tabsState.length - 1);
-                    const nextTabBtn = getTabButtonById(tabsState[newIndex].id);
-                    if (nextTabBtn) activateTab(nextTabBtn);
-                });
-            }
-
-            if (backBtn) backBtn.addEventListener('click', () => navigateTab(-1));
-            if (forwardBtn) forwardBtn.addEventListener('click', () => navigateTab(1));
-            if (refreshBtn) refreshBtn.addEventListener('click', () => renderActiveTabContent());
-            if (homeBtn) homeBtn.addEventListener('click', () => {
-                const activeState = getActiveTabState();
-                activeState.query = '';
-                activeState.url = '';
+        function activateTab(tab) {
+            if (!tab) return;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            activeTabId = tab.dataset.tabId;
+            const activeState = getActiveTabState();
+            if (activeState) {
                 searchInput.value = '';
                 renderActiveTabContent();
-            });
+            }
+        }
 
-            loadInitialQuery();
+        function createTabButton(state) {
+            const tab = document.createElement('button');
+            tab.className = 'tab';
+            tab.dataset.tabId = state.id;
+            tab.innerHTML = `<span>${state.label}</span>`;
+            tab.addEventListener('click', () => activateTab(tab));
+            return tab;
+        }
+
+        function createTabState() {
+            tabCount += 1;
+            const id = `tab-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+            const state = { 
+                id, 
+                label: `${tabCount}`, 
+                currentUrl: '', 
+                history: [],
+                historyIndex: -1
+            };
+            tabsState.push(state);
+            return state;
+        }
+
+        function addToHistory(tabState, url) {
+            // Remove any forward history if we're not at the end
+            if (tabState.historyIndex < tabState.history.length - 1) {
+                tabState.history = tabState.history.slice(0, tabState.historyIndex + 1);
+            }
+            // Add new URL to history
+            tabState.history.push(url);
+            tabState.historyIndex = tabState.history.length - 1;
+        }
+
+        function navigateToUrl(url) {
+            const activeState = getActiveTabState();
+            activeState.currentUrl = url;
+            addToHistory(activeState, url);
             renderActiveTabContent();
-        </script>
+        }
+
+        function canGoBack() {
+            const activeState = getActiveTabState();
+            return activeState.historyIndex > 0;
+        }
+
+        function canGoForward() {
+            const activeState = getActiveTabState();
+            return activeState.historyIndex < activeState.history.length - 1;
+        }
+
+        function goBack() {
+            const activeState = getActiveTabState();
+            if (canGoBack()) {
+                activeState.historyIndex--;
+                activeState.currentUrl = activeState.history[activeState.historyIndex];
+                renderActiveTabContent();
+            }
+        }
+
+        function goForward() {
+            const activeState = getActiveTabState();
+            if (canGoForward()) {
+                activeState.historyIndex++;
+                activeState.currentUrl = activeState.history[activeState.historyIndex];
+                renderActiveTabContent();
+            }
+        }
+
+        function renderWelcome() {
+            pageViewer.innerHTML = `
+                <div class="welcome">
+                    <i class="fa-solid fa-globe"></i>
+                    <h2>Welcome to BAMI Browser</h2>
+                    <p>Use the search bar above to search the web and see results here.</p>
+                </div>`;
+        }
+
+        function renderActiveTabContent() {
+            const active = getActiveTabState();
+            pageViewer.innerHTML = '';
+
+            if (!active.currentUrl) {
+                renderWelcome();
+                return;
+            }
+
+            // Create or update iframe for this tab
+            if (!tabFrames[active.id]) {
+                const iframe = document.createElement('iframe');
+                iframe.id = `iframe-${active.id}`;
+                iframe.className = 'page-frame';
+                iframe.src = active.currentUrl;
+                tabFrames[active.id] = iframe;
+            } else {
+                tabFrames[active.id].src = active.currentUrl;
+            }
+            pageViewer.appendChild(tabFrames[active.id]);
+        }
+
+        if (searchForm && searchInput) {
+            searchForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (!query) return;
+
+                let url;
+                if (isLink(query)) {
+                    url = buildUrl(query);
+                } else {
+                    url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                }
+
+                navigateToUrl(url);
+                searchInput.value = '';
+            });
+        }
+
+        if (newTabBtn && tabsContainer) {
+            newTabBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const state = createTabState();
+                const tab = createTabButton(state);
+                tabsContainer.insertBefore(tab, newTabBtn);
+                activateTab(tab);
+            });
+        }
+
+        if (closeTabBtn) {
+            closeTabBtn.addEventListener('click', function () {
+                const tabs = getTabs();
+                if (tabs.length <= 1) {
+                    alert('You must keep at least one tab.');
+                    return;
+                }
+                const activeState = getActiveTabState();
+                const activeTabButton = getTabButtonById(activeState.id);
+                if (activeTabButton) activeTabButton.remove();
+                const removedIndex = tabsState.findIndex(tab => tab.id === activeState.id);
+                tabsState.splice(removedIndex, 1);
+                delete tabFrames[activeState.id];
+                const newIndex = Math.min(removedIndex, tabsState.length - 1);
+                const nextTabBtn = getTabButtonById(tabsState[newIndex].id);
+                if (nextTabBtn) activateTab(nextTabBtn);
+            });
+        }
+
+        if (backBtn) backBtn.addEventListener('click', goBack);
+        if (forwardBtn) forwardBtn.addEventListener('click', goForward);
+        if (refreshBtn) refreshBtn.addEventListener('click', () => {
+            const activeState = getActiveTabState();
+            if (activeState.currentUrl) {
+                renderActiveTabContent();
+            }
+        });
+        if (homeBtn) homeBtn.addEventListener('click', () => {
+            const activeState = getActiveTabState();
+            activeState.currentUrl = '';
+            activeState.history = [];
+            activeState.historyIndex = -1;
+            searchInput.value = '';
+            renderActiveTabContent();
+        });
+
+        renderActiveTabContent();
+    </script>
     </body>
 </html>
