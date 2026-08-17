@@ -1,4 +1,4 @@
-constconst STORAGE_KEY = "bami-ai-conversations-v1";
+const STORAGE_KEY = "bami-ai-conversations-v1";
 const form = document.getElementById("chat-form");
 const input = document.getElementById("user-input");
 const chatBox = document.getElementById("chat-box");
