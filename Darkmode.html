@@ -1000,7 +1000,7 @@
             const name = 'bami-search-' + tabId;
             const url = buildUrl(query)
                 ? buildUrl(query)
-                : `https://searx.be/?q=${encodeURIComponent(query)}`;
+                : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
             try {
                 const win = window.open(url, name);
                 return win;
@@ -1020,8 +1020,8 @@
             const url = query
                 ? isLink(query)
                     ? `browser.html?q=${encodeURIComponent(query)}`
-                    : `https://searx.be/?q=${encodeURIComponent(query)}`
-                : 'https://searx.be/';
+                    : `https://www.google.com/search?q=${encodeURIComponent(query)}`
+                : 'https://www.google.com/';
             try { window.open(url, name); } catch (e) {}
         }
 
@@ -1032,7 +1032,7 @@
             updateActiveTabQuery(value);
             const url = buildUrl(value)
                 ? buildUrl(value)
-                : `https://searx.be/?q=${encodeURIComponent(value)}`;
+                : `https://www.google.com/search?q=${encodeURIComponent(value)}`;
             addToHistory('Search: ' + value, url);
 
             try {

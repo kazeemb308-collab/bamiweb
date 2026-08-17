@@ -812,7 +812,7 @@
             let text = input.value.trim();
             if (!text) return;
 
-            const url = buildUrl(text) || `https://searx.be/?q=${encodeURIComponent(text)}`;
+            const url = buildUrl(text) || `https://www.google.com/search?q=${encodeURIComponent(text)}`;
             window.location.href = url;
         });
         // Local Storage Keys
@@ -1076,7 +1076,7 @@
             const name = tabId ? 'bami-search-' + tabId : '_blank';
             const url = buildUrl(query)
                 ? buildUrl(query)
-                : `https://searx.be/?q=${encodeURIComponent(query)}`;
+                : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
             try {
                 const win = window.open(url, name, 'noopener,noreferrer');
                 if (win) {
@@ -1100,8 +1100,8 @@
             const url = query
                 ? buildUrl(query)
                     ? buildUrl(query)
-                    : `https://searx.be/?q=${encodeURIComponent(query)}`
-                : 'https://searx.be/';
+                    : `https://www.google.com/search?q=${encodeURIComponent(query)}`
+                : 'https://www.google.com/';
             try { window.open(url, name); } catch (e) {}
         }
 
@@ -1177,7 +1177,7 @@
             updateActiveTabQuery(value);
             const url = buildUrl(value)
                 ? buildUrl(value)
-                : `https://searx.be/?q=${encodeURIComponent(value)}`;
+                : `https://www.google.com/search?q=${encodeURIComponent(value)}`;
             addToHistory('Search: ' + value, url);
 
             try {
