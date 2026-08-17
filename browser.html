@@ -392,7 +392,7 @@
             function buildSearchUrl(query) {
                 const trimmed = query.trim();
                 if (!trimmed) return '';
-                return `https://searx.be/?q=${encodeURIComponent(trimmed)}`;
+                return `https://www.google.com/search?q=${encodeURIComponent(trimmed)}`;
             }
 
             function openSearch(query) {
@@ -474,7 +474,7 @@
                     <div class="search-error">
                         <h2>Unable to load results</h2>
                         <p>There was a problem loading results for “${query}”. Please try again.</p>
-                        <p><a href="https://searx.be/?q=${encodeURIComponent(query)}" target="_blank" rel="noopener noreferrer">Open Searx results</a></p>
+                        <p><a href="https://www.google.com/search?q=${encodeURIComponent(query)}" target="_blank" rel="noopener noreferrer">Open Google search</a></p>
                     </div>`;
             }
 
