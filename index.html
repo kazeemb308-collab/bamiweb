@@ -908,7 +908,9 @@
         }
 
         function loadBrowseHistory() {
-            const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+            // Privacy by default: clear any legacy browsing history.
+            localStorage.removeItem(HISTORY_KEY);
+            const history = [];
             const grid = document.getElementById('browse-grid');
             
             if (history.length === 0) {
@@ -939,16 +941,8 @@
         }
 
         function addToHistory(title, url) {
-            let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-            const item = {
-                title: title || 'Untitled',
-                url: url,
-                icon: 'fas fa-globe',
-                timestamp: Date.now()
-            };
-            history.unshift(item);
-            history = history.slice(0, 20);
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            // Do not store visited URLs or search terms on this device.
+            return false;
         }
 
         // Update Widgets
@@ -1076,7 +1070,7 @@
             const name = tabId ? 'bami-search-' + tabId : '_blank';
             const url = buildUrl(query)
                 ? buildUrl(query)
-                : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                : `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
             try {
                 const win = window.open(url, name, 'noopener,noreferrer');
                 if (win) {
@@ -1100,8 +1094,8 @@
             const url = query
                 ? buildUrl(query)
                     ? buildUrl(query)
-                    : `https://www.google.com/search?q=${encodeURIComponent(query)}`
-                : 'https://www.google.com/';
+                    : `https://duckduckgo.com/?q=${encodeURIComponent(query)}`
+                : 'https://duckduckgo.com/';
             try { window.open(url, name); } catch (e) {}
         }
 
@@ -1116,37 +1110,7 @@
                 suggestionsList.style.display = 'none';
                 return;
             }
-
-            const localMatches = getLocalSuggestions(query);
-            const requestId = ++activeRequestId;
-            const callbackName = `bamiSuggest${Date.now()}${Math.floor(Math.random() * 100000)}`;
-
-            window[callbackName] = (data) => {
-                delete window[callbackName];
-                if (requestId !== activeRequestId) return;
-
-                const remoteItems = Array.isArray(data?.[1])
-                    ? data[1].filter(Boolean).map(item => String(item).trim())
-                    : [];
-
-                const combined = [...new Set([...remoteItems, ...localMatches])].slice(0, 10);
-                renderSuggestions(combined);
-            };
-
-            const script = document.createElement('script');
-            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&hl=en&q=${encodeURIComponent(query)}&callback=${callbackName}`;
-            script.async = true;
-            script.onerror = () => {
-                if (requestId === activeRequestId) renderSuggestions(localMatches);
-            };
-
-            if (pendingScript) pendingScript.remove();
-            document.body.appendChild(script);
-            pendingScript = script;
-
-            setTimeout(() => {
-                if (script.parentNode) script.parentNode.removeChild(script);
-            }, 4000);
+            renderSuggestions(getLocalSuggestions(query));
         }
 
         function renderSuggestions(items) {
@@ -1173,28 +1137,14 @@
         function performSearch(query) {
             const value = String(query || searchInput.value || '').trim();
             if (!value) return false;
-
             updateActiveTabQuery(value);
             const url = buildUrl(value)
                 ? buildUrl(value)
-                : `https://www.google.com/search?q=${encodeURIComponent(value)}`;
-            addToHistory('Search: ' + value, url);
-
-            try {
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                return true;
-            } catch (e) {
-                try {
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                } catch (err) {}
-                return true;
-            }
+                : `https://duckduckgo.com/?q=${encodeURIComponent(value)}`;
+            // Navigate from the real submit/click action; do not synthesize anchor clicks.
+            const opened = window.open(url, '_blank', 'noopener,noreferrer');
+            if (!opened) window.location.assign(url);
+            return true;
         }
 
         // Event Listeners
