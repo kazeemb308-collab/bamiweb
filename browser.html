@@ -392,6 +392,15 @@
         }
 
         function navigateToUrl(url) {
+            // Use the device's real browser for authentication/account pages.
+            const host = new URL(url, window.location.href).hostname.toLowerCase();
+            const authHosts = ['facebook.com', 'fb.com', 'instagram.com', 'accounts.google.com', 'login.microsoftonline.com'];
+            const isAuthHost = authHosts.some(domain => host === domain || host.endsWith('.' + domain));
+            if (isAuthHost) {
+                const opened = window.open(url, '_blank', 'noopener,noreferrer');
+                if (!opened) window.location.assign(url);
+                return;
+            }
             const activeState = getActiveTabState();
             activeState.currentUrl = url;
             addToHistory(activeState, url);
@@ -467,7 +476,7 @@
                 if (isLink(query)) {
                     url = buildUrl(query);
                 } else {
-                    url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                    url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
                 }
 
                 navigateToUrl(url);
