@@ -1027,6 +1027,20 @@
         function saveTabs(tabs) { try{ localStorage.setItem(TABS_KEY, JSON.stringify(tabs)); } catch(e){} }
         function saveActiveTab(id) { try{ localStorage.setItem(ACTIVE_TAB_KEY, id); } catch(e){} }
 
+        function sanitizeSavedTabs() {
+            try {
+                const tabs = JSON.parse(localStorage.getItem(TABS_KEY) || '[]');
+                if (!Array.isArray(tabs)) return;
+                tabs.forEach((tab, index) => {
+                    if (!tab) return;
+                    tab.query = '';
+                    tab.title = `Tab ${index + 1}`;
+                });
+                localStorage.setItem(TABS_KEY, JSON.stringify(tabs));
+            } catch (e) {}
+        }
+        sanitizeSavedTabs();
+
         function renderTabs() {
             const container = document.getElementById('search-tabs');
             if (!container) return;
