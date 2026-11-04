@@ -812,7 +812,7 @@
             let text = input.value.trim();
             if (!text) return;
 
-            const url = buildUrl(text) || `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+            const url = buildUrl(text) || `https://duckduckgo.com/?q=${encodeURIComponent(text)}`;
             window.location.href = url;
         });
         // Local Storage Keys
@@ -821,7 +821,7 @@
 
         // Default Pinned Websites
         const defaultPins = [
-            { name: 'Google', url: 'https://www.google.com', icon: 'fa-google' },
+            { name: 'DuckDuckGo', url: 'https://duckduckgo.com', icon: 'fa-search' },
             { name: 'YouTube', url: 'https://www.youtube.com', icon: 'fa-youtube' },
             { name: 'Wikipedia', url: 'https://www.wikipedia.org', icon: 'fa-wikipedia-w' },
             { name: 'GitHub', url: 'https://www.github.com', icon: 'fa-github' },
